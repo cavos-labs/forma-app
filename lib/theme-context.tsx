@@ -23,6 +23,9 @@ interface ThemeContextType {
     buttonHover: string;
     accent: string;
     muted: string;
+    primary: string;
+    card: string;
+    border: string;
   };
   logos: {
     leftLogo: string;
@@ -48,6 +51,9 @@ function getThemeColors(theme: Theme) {
       buttonHover: '#d4d4d4',
       accent: '#ededed',
       muted: '#a1a1aa',
+      primary: '#f0f0f0',
+      card: '#1f1f1f',
+      border: '#404040',
     };
   }
   
@@ -67,6 +73,9 @@ function getThemeColors(theme: Theme) {
     buttonHover: '#2a2a2a',
     accent: '#373737',
     muted: '#666666',
+    primary: '#373737',
+    card: '#f9fafb',
+    border: '#d1d5db',
   };
 }
 

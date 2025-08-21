@@ -1,20 +1,8 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authApi, AuthResponse, ApiError } from './api';
-
-interface User {
-  id: string;
-  email: string;
-  metadata: any;
-}
-
-interface Gym {
-  id: string;
-  name: string;
-  is_active: boolean;
-  role: string;
-}
+import { authApi, ApiError } from './api';
+import { User, Gym, AuthResponse } from './types';
 
 interface AuthContextType {
   user: User | null;
@@ -25,6 +13,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshGymStatus: () => Promise<void>;
+  clearSession: () => void;
   error: string | null;
   clearError: () => void;
 }
@@ -99,32 +88,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Only clear localStorage on main pages, not on success page
+  const clearSession = () => {
+    setUser(null);
+    setGym(null);
+    localStorage.removeItem('forma_user');
+    localStorage.removeItem('forma_gym');
+    console.log('🗑️ Session cleared manually');
+  };
+
+  // Load persisted data on app startup
   useEffect(() => {
-    // Don't clear data if we're on the success page
-    if (typeof window !== 'undefined' && window.location.pathname === '/success') {
-      // Load existing data if available
+    if (typeof window !== 'undefined') {
       const storedUser = localStorage.getItem('forma_user');
       const storedGym = localStorage.getItem('forma_gym');
       
       if (storedUser && storedGym) {
         try {
-          setUser(JSON.parse(storedUser));
-          setGym(JSON.parse(storedGym));
-          console.log('✅ Loaded existing auth data for success page');
+          const userData = JSON.parse(storedUser);
+          const gymData = JSON.parse(storedGym);
+          setUser(userData);
+          setGym(gymData);
+          console.log('✅ Loaded existing auth data from localStorage');
         } catch (err) {
           console.error('Error parsing stored auth data:', err);
+          // Clear corrupted data
+          localStorage.removeItem('forma_user');
+          localStorage.removeItem('forma_gym');
         }
+      } else {
+        console.log('ℹ️ No auth data found in localStorage');
       }
-      return;
     }
-    
-    // Clear data for other pages to force fresh signin
-    localStorage.removeItem('forma_user');
-    localStorage.removeItem('forma_gym');
-    setUser(null);
-    setGym(null);
-    console.log('🗑️ Cleared all localStorage data - fresh signin required');
   }, []);
 
   const value: AuthContextType = {
@@ -136,6 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signIn,
     signOut,
     refreshGymStatus,
+    clearSession,
     error,
     clearError,
   };

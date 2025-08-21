@@ -10,6 +10,23 @@ const nextConfig = {
         source: '/api/currency/:path*',
         destination: 'https://formacr.com/api/currency/:path*',
       },
+      {
+        source: '/api/users/:path*',
+        destination: 'https://formacr.com/api/users/:path*',
+      },
+      {
+        source: '/api/memberships/:path*',
+        destination: 'https://formacr.com/api/memberships/:path*',
+      },
+      {
+        source: '/api/payments/:path*',
+        destination: 'https://formacr.com/api/payments/:path*',
+      },
+      // General fallback for any other API routes
+      {
+        source: '/api/:path*',
+        destination: 'https://formacr.com/api/:path*',
+      },
     ];
   },
   async headers() {
