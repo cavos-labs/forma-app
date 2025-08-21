@@ -10,7 +10,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   isGymActive: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   signOut: () => Promise<void>;
   refreshGymStatus: () => Promise<void>;
   clearSession: () => void;
@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const clearError = () => setError(null);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, rememberMe: boolean = false) => {
     setIsLoading(true);
     setError(null);
 
@@ -42,9 +42,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(response.user);
         setGym(response.gym);
         
-        // Store session data in localStorage for persistence
-        localStorage.setItem('forma_user', JSON.stringify(response.user));
-        localStorage.setItem('forma_gym', JSON.stringify(response.gym));
+        // Store session data based on rememberMe preference
+        const storage = rememberMe ? localStorage : sessionStorage;
+        storage.setItem('forma_user', JSON.stringify(response.user));
+        storage.setItem('forma_gym', JSON.stringify(response.gym));
+        storage.setItem('forma_remember_me', rememberMe.toString());
       }
     } catch (err) {
       if (err instanceof ApiError) {
@@ -68,8 +70,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setUser(null);
       setGym(null);
+      // Clear from both storages
       localStorage.removeItem('forma_user');
       localStorage.removeItem('forma_gym');
+      localStorage.removeItem('forma_remember_me');
+      sessionStorage.removeItem('forma_user');
+      sessionStorage.removeItem('forma_gym');
+      sessionStorage.removeItem('forma_remember_me');
       setIsLoading(false);
     }
   };
@@ -78,10 +85,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!gym) return;
     
     try {
-      // Simply update the gym status to active in localStorage
+      // Simply update the gym status to active in the appropriate storage
       const updatedGym = { ...gym, is_active: true };
       setGym(updatedGym);
-      localStorage.setItem('forma_gym', JSON.stringify(updatedGym));
+      
+      // Check which storage is being used
+      const hasLocalStorage = localStorage.getItem('forma_gym') !== null;
+      const storage = hasLocalStorage ? localStorage : sessionStorage;
+      storage.setItem('forma_gym', JSON.stringify(updatedGym));
       console.log('✅ Gym status refreshed to active');
     } catch (error) {
       console.error('Error refreshing gym status:', error);
@@ -91,16 +102,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const clearSession = () => {
     setUser(null);
     setGym(null);
+    // Clear from both storages
     localStorage.removeItem('forma_user');
     localStorage.removeItem('forma_gym');
+    localStorage.removeItem('forma_remember_me');
+    sessionStorage.removeItem('forma_user');
+    sessionStorage.removeItem('forma_gym');
+    sessionStorage.removeItem('forma_remember_me');
     console.log('🗑️ Session cleared manually');
   };
 
   // Load persisted data on app startup
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const storedUser = localStorage.getItem('forma_user');
-      const storedGym = localStorage.getItem('forma_gym');
+      // Check localStorage first (rememberMe = true)
+      let storedUser = localStorage.getItem('forma_user');
+      let storedGym = localStorage.getItem('forma_gym');
+      let storageType = 'localStorage';
+      
+      // If not found in localStorage, check sessionStorage
+      if (!storedUser || !storedGym) {
+        storedUser = sessionStorage.getItem('forma_user');
+        storedGym = sessionStorage.getItem('forma_gym');
+        storageType = 'sessionStorage';
+      }
       
       if (storedUser && storedGym) {
         try {
@@ -108,15 +133,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const gymData = JSON.parse(storedGym);
           setUser(userData);
           setGym(gymData);
-          console.log('✅ Loaded existing auth data from localStorage');
+          console.log(`✅ Loaded existing auth data from ${storageType}`);
         } catch (err) {
           console.error('Error parsing stored auth data:', err);
-          // Clear corrupted data
+          // Clear corrupted data from both storages
           localStorage.removeItem('forma_user');
           localStorage.removeItem('forma_gym');
+          localStorage.removeItem('forma_remember_me');
+          sessionStorage.removeItem('forma_user');
+          sessionStorage.removeItem('forma_gym');
+          sessionStorage.removeItem('forma_remember_me');
         }
       } else {
-        console.log('ℹ️ No auth data found in localStorage');
+        console.log('ℹ️ No auth data found in any storage');
       }
     }
   }, []);

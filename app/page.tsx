@@ -80,7 +80,7 @@ export default function AuthPage() {
 
     try {
       if (isLogin) {
-        await signIn(formData.email, formData.password);
+        await signIn(formData.email, formData.password, rememberMe);
         // Navigation will be handled by the auth context or a separate effect
       } else {
         const response = await authApi.signUp({
@@ -151,13 +151,10 @@ export default function AuthPage() {
               <Image 
                 src={logos.leftLogo}
                 alt="FORMA"
-                width={96}
-                height={96}
+                width={200}
+                height={100}
                 className="h-16 xl:h-24 mb-6 xl:mb-8"
               />
-              <span className="text-base xl:text-lg font-medium tracking-wider uppercase opacity-90">
-                {t('formaSystem')}
-              </span>
             </div>
             
             <p className="text-lg xl:text-xl opacity-90 leading-relaxed mb-8 xl:mb-12">
