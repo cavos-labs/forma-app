@@ -10,7 +10,7 @@ interface CreateUserModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave?: (userData: UserFormData) => void;
-  onSuccess?: (userData: any) => void; // Called when user is successfully created
+  onSuccess?: (userData: UserFormData) => void; // Called when user is successfully created
 }
 
 export interface UserFormData {
@@ -22,12 +22,21 @@ export interface UserFormData {
   monthly_fee: number;
 }
 
+interface FormErrors {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+  date_of_birth?: string;
+  monthly_fee?: string;
+}
+
 export default function CreateUserModal({ isOpen, onClose, onSave, onSuccess }: CreateUserModalProps) {
   const { theme, colors } = useTheme();
   const { language } = useLanguage();
   const { gym } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<Partial<UserFormData>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [successMessage, setSuccessMessage] = useState<string>('');
   
   const [formData, setFormData] = useState<UserFormData>(() => ({
@@ -49,7 +58,7 @@ export default function CreateUserModal({ isOpen, onClose, onSave, onSuccess }: 
   if (!isOpen) return null;
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<UserFormData> = {};
+    const newErrors: FormErrors = {};
 
     if (!formData.first_name.trim()) {
       newErrors.first_name = language === 'es' ? 'El nombre es requerido' : 'First name is required';
@@ -99,7 +108,7 @@ export default function CreateUserModal({ isOpen, onClose, onSave, onSuccess }: 
     }));
     
     // Clear error for this field when user starts typing
-    if (errors[name as keyof UserFormData]) {
+    if (errors[name as keyof FormErrors]) {
       setErrors(prev => ({
         ...prev,
         [name]: undefined
@@ -147,7 +156,12 @@ export default function CreateUserModal({ isOpen, onClose, onSave, onSuccess }: 
           last_name: response.user?.lastName || formData.last_name,
         });
         
-        onSuccess?.(response);
+        onSuccess?.({
+          ...formData,
+          email: response.user?.email || formData.email,
+          first_name: response.user?.firstName || formData.first_name,
+          last_name: response.user?.lastName || formData.last_name,
+        });
         
         // Reset form after a delay to show success message
         setTimeout(() => {

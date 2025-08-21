@@ -148,9 +148,11 @@ export default function AuthPage() {
           <div className="max-w-lg">
             {/* Forma Logo */}
             <div className="mb-8 xl:mb-12">
-              <img 
+              <Image 
                 src={logos.leftLogo}
                 alt="FORMA"
+                width={96}
+                height={96}
                 className="h-16 xl:h-24 mb-6 xl:mb-8"
               />
               <span className="text-base xl:text-lg font-medium tracking-wider uppercase opacity-90">

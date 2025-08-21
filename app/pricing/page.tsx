@@ -10,7 +10,7 @@ import getStripe from "@/lib/stripe";
 
 export default function PricingPage() {
   const { language, setLanguage, t } = useLanguage();
-  const { theme, toggleTheme, colors, logos } = useTheme();
+  const { theme, toggleTheme, colors } = useTheme();
   const { signOut, gym } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly' | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -51,7 +51,7 @@ export default function PricingPage() {
     console.log('Gym ID:', gym?.id);
 
     // Try to get gym ID from different possible sources
-    const gymId = gym?.id || (gym as any)?.gymId || localStorage.getItem('forma_gym_id');
+    const gymId = gym?.id || localStorage.getItem('forma_gym_id');
     console.log('Resolved Gym ID:', gymId);
 
     if (!gymId) {
@@ -183,7 +183,7 @@ export default function PricingPage() {
               language={language}
               setLanguage={setLanguage}
               colors={colors}
-              t={t}
+              t={t as (key: string) => string}
               signOut={signOut}
               router={router}
               onClose={handleCloseMenu}
@@ -447,10 +447,10 @@ function MobileMenuContent({
   toggleTheme: () => void;
   language: string;
   setLanguage: (lang: 'en' | 'es') => void;
-  colors: any;
-  t: (key: any) => string;
+  colors: Record<string, string>;
+  t: (key: string) => string;
   signOut: () => Promise<void>;
-  router: any;
+  router: { push: (path: string) => void };
   onClose: () => void;
 }) {
   return (

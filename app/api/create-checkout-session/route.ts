@@ -20,13 +20,13 @@ export async function POST(request: NextRequest) {
     const prices = {
       monthly: {
         amount: 2750000, // ₡27,500 in cents (Costa Rican Colón)
-        currency: 'crc',
-        interval: 'month',
+        currency: 'crc' as const,
+        interval: 'month' as const,
       },
       yearly: {
         amount: 33000000, // ₡330,000 in cents
-        currency: 'crc',
-        interval: 'year',
+        currency: 'crc' as const,
+        interval: 'year' as const,
       },
     };
 

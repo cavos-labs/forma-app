@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from '@/lib/theme-context';
 import { useLanguage } from '@/lib/language-context';
 import { useAuth } from '@/lib/auth-context';
@@ -49,7 +49,7 @@ type PaymentStatus = 'all' | 'pending' | 'approved' | 'rejected' | 'cancelled';
 export default function Payments() {
   const { colors } = useTheme();
   const { language } = useLanguage();
-  const { gym } = useAuth();
+  const { gym, user } = useAuth();
   const [payments, setPayments] = useState<PaymentData[]>([]);
   const [statusFilter, setStatusFilter] = useState<PaymentStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -69,10 +69,10 @@ export default function Payments() {
   } | null>(null);
 
   // Translation function
-  const t = (es: string, en: string) => language === 'es' ? es : en;
+  const t = useCallback((es: string, en: string) => language === 'es' ? es : en, [language]);
 
   // Load payments from API
-  const loadPayments = async () => {
+  const loadPayments = useCallback(async () => {
     if (!gym?.id) return;
 
     setIsLoading(true);
@@ -87,7 +87,7 @@ export default function Payments() {
       });
 
       if (response.success && response.payments) {
-        setPayments(response.payments);
+        setPayments(response.payments as PaymentData[]);
       }
     } catch (err) {
       console.error('Error loading payments:', err);
@@ -103,7 +103,7 @@ export default function Payments() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [gym?.id, statusFilter, t]);
 
   // Update payment status
   const updatePaymentStatus = async (paymentId: string, status: 'approved' | 'rejected', rejectionReason?: string) => {
@@ -114,7 +114,7 @@ export default function Payments() {
         paymentId,
         status,
         rejectionReason,
-        approvedBy: gym?.admin_id, // You might need to get this from context
+        approvedBy: user?.id, // Use the logged-in user as the approver
       });
 
       if (response.success) {
@@ -142,14 +142,14 @@ export default function Payments() {
   // Load payments when component mounts or gym changes
   useEffect(() => {
     loadPayments();
-  }, [gym?.id]);
+  }, [loadPayments]);
 
   // Reload when status filter changes
   useEffect(() => {
     if (gym?.id) {
       loadPayments();
     }
-  }, [statusFilter]);
+  }, [gym?.id, loadPayments, statusFilter]);
 
   const getStatusColor = (status: PaymentStatus) => {
     switch (status) {
@@ -222,11 +222,65 @@ export default function Payments() {
 
   return (
     <div className="p-3 sm:p-6">
+      <style jsx>{`
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fade-in-up {
+          animation: fade-in-up 0.5s ease-out;
+        }
+        
+        @keyframes pulse-soft {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.8;
+          }
+        }
+        
+        .animate-pulse-soft {
+          animation: pulse-soft 2s ease-in-out infinite;
+        }
+      `}</style>
       {/* Header - Mobile simplified */}
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between items-center">
         <h1 className="text-xl sm:text-2xl font-bold mt-2" style={{ color: colors.foreground }}>
           {t('Pagos', 'Payments')}
         </h1>
+        <button
+          onClick={loadPayments}
+          disabled={isLoading}
+          className="p-2 rounded-lg transition-all duration-200 hover:scale-105 disabled:opacity-50"
+          style={{ 
+            backgroundColor: colors.buttonBackground,
+            color: colors.buttonText,
+            border: 'none'
+          }}
+          title={t('Actualizar pagos', 'Refresh payments')}
+        >
+          <svg 
+            className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
+            />
+          </svg>
+        </button>
       </div>
 
       {/* Status Filter Tabs - Horizontal scroll on mobile */}
@@ -235,7 +289,7 @@ export default function Payments() {
           <button
             key={status}
             onClick={() => setStatusFilter(status as PaymentStatus)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap hover:scale-105 active:scale-95 ${
               statusFilter === status ? 'ring-2' : ''
             }`}
             style={{
@@ -302,13 +356,15 @@ export default function Payments() {
       {/* Payments Grid - Mobile optimized */}
       {!isLoading && (
         <div className="space-y-4 sm:space-y-6">
-        {filteredPayments.map((payment) => (
+        {filteredPayments.map((payment, index) => (
           <div
             key={payment.id}
-            className="rounded-lg border p-4 transition-colors hover:shadow-md"
+            className="rounded-xl border p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.01] hover:-translate-y-0.5 animate-fade-in-up"
             style={{
               backgroundColor: colors.card,
               borderColor: colors.border,
+              animationDelay: `${index * 100}ms`,
+              animationFillMode: 'both'
             }}
           >
             {/* Mobile-first simplified layout */}
@@ -370,7 +426,7 @@ export default function Payments() {
                         });
                         setReceiptModalOpen(true);
                       }}
-                      className="text-xs px-3 py-1.5 rounded-md font-bold"
+                      className="text-xs px-3 py-1.5 rounded-lg font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
                       style={{ backgroundColor: '#0066ff', color: 'white', border: 'none', boxShadow: 'none' }}
                     >
                       {t('Ver comprobante', 'View Receipt')}
@@ -386,8 +442,8 @@ export default function Payments() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => updatePaymentStatus(payment.id, 'approved')}
-                      className="px-4 py-1.5 rounded-md text-xs font-bold transition-colors hover:opacity-90"
-                      style={{ backgroundColor: '#15803D', color: 'white', border: 'none', boxShadow: 'none' }}
+                      className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+                      style={{ backgroundColor: '#00CC44', color: 'white', border: 'none', boxShadow: 'none' }}
                     >
                       {t('Aprobar', 'Approve')}
                     </button>
@@ -396,8 +452,8 @@ export default function Payments() {
                         setSelectedPayment(payment);
                         setIsModalOpen(true);
                       }}
-                      className="px-4 py-1.5 rounded-md text-xs font-bold transition-colors hover:opacity-90"
-                      style={{ backgroundColor: '#DC2626', color: 'white', border: 'none', boxShadow: 'none' }}
+                      className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+                      style={{ backgroundColor: '#FF3333', color: 'white', border: 'none', boxShadow: 'none' }}
                     >
                       {t('Rechazar', 'Reject')}
                     </button>

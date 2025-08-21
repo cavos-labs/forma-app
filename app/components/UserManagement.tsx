@@ -14,7 +14,7 @@ export default function UserManagement({ onCreateUser }: UserManagementProps) {
   const { language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | MockUser['membership_status']>('all');
-  const [users, setUsers] = useState(mockUsers);
+  const [users] = useState(mockUsers);
 
   // Filter users based on search and status
   const filteredUsers = users.filter(user => {
@@ -326,7 +326,7 @@ export default function UserManagement({ onCreateUser }: UserManagementProps) {
               </tr>
             </thead>
             <tbody style={{ backgroundColor: colors.background }}>
-              {filteredUsers.map((user, index) => (
+              {filteredUsers.map((user) => (
                 <tr 
                   key={user.id} 
                   className="border-t transition-all duration-200 hover:bg-opacity-50 group"
@@ -442,7 +442,7 @@ export default function UserManagement({ onCreateUser }: UserManagementProps) {
 
       {/* Mobile Cards */}
       <div className="lg:hidden space-y-4">
-        {filteredUsers.map((user, index) => (
+        {filteredUsers.map((user) => (
           <div 
             key={user.id}
             className="p-4 rounded-2xl border transition-all duration-200"

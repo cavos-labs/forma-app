@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authApi, ApiError } from './api';
-import { User, Gym, AuthResponse } from './types';
+import { User, Gym } from './types';
 
 interface AuthContextType {
   user: User | null;

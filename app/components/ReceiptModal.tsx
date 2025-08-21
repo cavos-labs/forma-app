@@ -1,5 +1,7 @@
 'use client'
 
+import Image from 'next/image';
+import { useState } from 'react';
 import { useTheme } from '@/lib/theme-context';
 import { useLanguage } from '@/lib/language-context';
 
@@ -18,6 +20,7 @@ interface ReceiptModalProps {
 export default function ReceiptModal({ isOpen, onClose, imageUrl, paymentInfo }: ReceiptModalProps) {
   const { colors } = useTheme();
   const { language } = useLanguage();
+  const [imageError, setImageError] = useState(false);
 
   const t = (es: string, en: string) => language === 'es' ? es : en;
 
@@ -44,9 +47,34 @@ export default function ReceiptModal({ isOpen, onClose, imageUrl, paymentInfo }:
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[9999] p-2 sm:p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[9999] p-2 sm:p-4 animate-fade-in">
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes scale-in {
+          from { 
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+          }
+          to { 
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+        
+        .animate-fade-in {
+          animation: fade-in 0.2s ease-out;
+        }
+        
+        .animate-scale-in {
+          animation: scale-in 0.3s ease-out;
+        }
+      `}</style>
       <div 
-        className="bg-white rounded-lg max-w-4xl max-h-[95vh] sm:max-h-[90vh] w-full overflow-hidden flex flex-col"
+        className="bg-white rounded-lg max-w-4xl max-h-[95vh] sm:max-h-[90vh] w-full overflow-hidden flex flex-col animate-scale-in"
         style={{ backgroundColor: colors.card }}
       >
         {/* Header */}
@@ -74,7 +102,7 @@ export default function ReceiptModal({ isOpen, onClose, imageUrl, paymentInfo }:
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0"
+            className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200 hover:scale-110 active:scale-95 flex-shrink-0"
             style={{ color: colors.foreground }}
           >
             <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,24 +114,44 @@ export default function ReceiptModal({ isOpen, onClose, imageUrl, paymentInfo }:
         {/* Image Container */}
         <div className="flex-1 overflow-auto p-4 sm:p-6">
           <div className="flex justify-center">
-            <img 
-              src={imageUrl}
-              alt={t('Comprobante de pago', 'Payment receipt')}
-              className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
-              style={{ maxHeight: 'calc(70vh - 120px)' }}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                target.parentElement!.innerHTML = `
-                  <div class="flex flex-col items-center justify-center p-8 sm:p-12 text-gray-500">
-                    <svg class="w-12 h-12 sm:w-16 sm:h-16 mb-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
-                    </svg>
-                    <p class="text-sm sm:text-base text-center">${t('No se pudo cargar la imagen', 'Could not load image')}</p>
-                  </div>
-                `;
-              }}
-            />
+            <div className="w-full max-w-2xl">
+              {!imageError ? (
+                <Image 
+                  src={imageUrl}
+                  alt={t('Comprobante de pago', 'Payment receipt')}
+                  width={800}
+                  height={600}
+                  className="w-full h-auto object-contain rounded-lg shadow-lg max-h-[70vh]"
+                  onError={(e) => {
+                    console.error('Error loading image:', imageUrl, e);
+                    setImageError(true);
+                  }}
+                  onLoad={() => {
+                    console.log('Image loaded successfully:', imageUrl);
+                    setImageError(false);
+                  }}
+                />
+              ) : (
+                <div className="w-full h-96 bg-gray-100 rounded-lg shadow-lg flex flex-col items-center justify-center" style={{ backgroundColor: colors.inputBackground }}>
+                  <svg className="w-16 h-16 mb-4" style={{ color: colors.muted }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <p className="text-center mb-4" style={{ color: colors.muted }}>
+                    {t('Error al cargar la imagen', 'Error loading image')}
+                  </p>
+                  <button
+                    onClick={() => window.open(imageUrl, '_blank')}
+                    className="px-4 py-2 rounded-lg font-medium transition-colors"
+                    style={{ 
+                      backgroundColor: colors.buttonBackground, 
+                      color: colors.buttonText
+                    }}
+                  >
+                    {t('Ver imagen original', 'View original image')}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -111,7 +159,7 @@ export default function ReceiptModal({ isOpen, onClose, imageUrl, paymentInfo }:
         <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 p-4 sm:p-6 border-t" style={{ borderColor: colors.border }}>
           <button
             onClick={() => window.open(imageUrl, '_blank')}
-            className="px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base order-2 sm:order-1"
+            className="px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 text-sm sm:text-base order-2 sm:order-1"
             style={{ 
               backgroundColor: colors.buttonBackground, 
               color: colors.buttonText
@@ -121,7 +169,7 @@ export default function ReceiptModal({ isOpen, onClose, imageUrl, paymentInfo }:
           </button>
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg font-medium border transition-colors text-sm sm:text-base order-1 sm:order-2"
+            className="px-4 py-2 rounded-lg font-medium border transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 text-sm sm:text-base order-1 sm:order-2"
             style={{ 
               backgroundColor: colors.card,
               borderColor: colors.border,

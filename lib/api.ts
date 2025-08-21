@@ -299,7 +299,7 @@ export const authApi = {
     }),
 
   // Test endpoint to debug proxy issues
-  testUsersEndpoint: (): Promise<any> =>
+  testUsersEndpoint: (): Promise<unknown> =>
     apiRequest('/api/users', {
       method: 'POST',
       body: JSON.stringify({

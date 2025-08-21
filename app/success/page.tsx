@@ -1,16 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useLanguage } from '@/lib/language-context';
 import { useTheme } from '@/lib/theme-context';
 import { useAuth } from '@/lib/auth-context';
 
-export default function SuccessPage() {
+function SuccessPageContent() {
   const { t } = useLanguage();
   const { colors } = useTheme();
-  const { user, gym, refreshGymStatus } = useAuth();
+  const { gym, refreshGymStatus } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isProcessing, setIsProcessing] = useState(true);
@@ -70,7 +70,7 @@ export default function SuccessPage() {
     const timer = setTimeout(activateGym, 2000);
 
     return () => clearTimeout(timer);
-  }, [searchParams, router, gym]);
+  }, [searchParams, router, gym, refreshGymStatus]);
 
   const handleContinue = () => {
     // After successful payment and gym activation, go directly to dashboard
@@ -127,5 +127,13 @@ export default function SuccessPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SuccessPageContent />
+    </Suspense>
   );
 }

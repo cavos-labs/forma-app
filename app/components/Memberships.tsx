@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef, useCallback } from 'react';
 import { useTheme } from '@/lib/theme-context';
 import { useLanguage } from '@/lib/language-context';
 import { useAuth } from '@/lib/auth-context';
@@ -153,10 +153,10 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(({ onCreateUser
   } | null>(null);
 
   // Translation function
-  const t = (es: string, en: string) => language === 'es' ? es : en;
+  const t = useCallback((es: string, en: string) => language === 'es' ? es : en, [language]);
 
   // Load memberships from API
-  const loadMemberships = async () => {
+  const loadMemberships = useCallback(async () => {
     if (!gym?.id) return;
 
     setIsLoading(true);
@@ -219,7 +219,7 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(({ onCreateUser
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [gym?.id, statusFilter, t]);
 
   // Expose refresh function to parent component
   useImperativeHandle(ref, () => ({
@@ -229,14 +229,14 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(({ onCreateUser
   // Load memberships when component mounts or gym changes
   useEffect(() => {
     loadMemberships();
-  }, [gym?.id]);
+  }, [loadMemberships]);
 
   // Reload when status filter changes
   useEffect(() => {
     if (gym?.id) {
       loadMemberships();
     }
-  }, [statusFilter]);
+  }, [gym?.id, loadMemberships, statusFilter]);
 
   const getStatusColor = (status: MembershipStatus) => {
     switch (status) {
@@ -337,6 +337,35 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(({ onCreateUser
 
   return (
     <div className="p-3 sm:p-6">
+      <style jsx>{`
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fade-in-up {
+          animation: fade-in-up 0.5s ease-out;
+        }
+        
+        @keyframes pulse-soft {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.8;
+          }
+        }
+        
+        .animate-pulse-soft {
+          animation: pulse-soft 2s ease-in-out infinite;
+        }
+      `}</style>
       {/* Header */}
       <div className="mb-4 sm:mb-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -348,16 +377,43 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(({ onCreateUser
               {t('Gestiona todas las membresías', 'Manage all memberships')}
             </p>
           </div>
-          <button
-            onClick={onCreateUser}
-            className="px-4 py-2 rounded-lg font-medium transition-colors w-full sm:w-auto"
-            style={{ 
-              backgroundColor: colors.buttonBackground, 
-              color: colors.buttonText
-            }}
-          >
-            {t('Nueva Membresía', 'New Membership')}
-          </button>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <button
+              onClick={loadMemberships}
+              disabled={isLoading}
+              className="p-2 rounded-lg transition-all duration-200 hover:scale-105 disabled:opacity-50"
+              style={{ 
+                backgroundColor: colors.buttonBackground,
+                color: colors.buttonText,
+                border: 'none'
+              }}
+              title={t('Actualizar membresías', 'Refresh memberships')}
+            >
+              <svg 
+                className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
+                />
+              </svg>
+            </button>
+            <button
+              onClick={onCreateUser}
+              className="px-4 py-2 rounded-lg font-medium transition-colors flex-1 sm:flex-none"
+              style={{ 
+                backgroundColor: colors.buttonBackground, 
+                color: colors.buttonText
+              }}
+            >
+              {t('Nueva Membresía', 'New Membership')}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -367,7 +423,7 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(({ onCreateUser
           <button
             key={status}
             onClick={() => setStatusFilter(status as MembershipStatus | 'all')}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap hover:scale-105 active:scale-95 ${
               statusFilter === status ? 'ring-2' : ''
             }`}
             style={{
@@ -435,13 +491,15 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(({ onCreateUser
       {/* Memberships Grid - Mobile optimized */}
       {!isLoading && (
         <div className="space-y-4 sm:space-y-6">
-        {filteredMemberships.map((membership) => (
+        {filteredMemberships.map((membership, index) => (
           <div
             key={membership.id}
-            className="rounded-lg border p-4 transition-colors hover:shadow-md"
+            className="rounded-xl border p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.01] hover:-translate-y-0.5 animate-fade-in-up"
             style={{
               backgroundColor: colors.card,
               borderColor: colors.border,
+              animationDelay: `${index * 100}ms`,
+              animationFillMode: 'both'
             }}
           >
             {/* Mobile-first simplified layout */}
@@ -497,7 +555,7 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(({ onCreateUser
               {/* Action Row */}
               <div className="flex justify-between items-center pt-2 border-t" style={{ borderColor: colors.border }}>
                 <div className="flex gap-2">
-                  {membership.latest_payment?.payment_proof_url ? (
+                  {membership.latest_payment?.payment_proof_url && !membership.latest_payment.payment_proof_url.includes('pending-upload') ? (
                     <button
                       onClick={() => {
                         setSelectedReceipt({
@@ -511,11 +569,15 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(({ onCreateUser
                         });
                         setReceiptModalOpen(true);
                       }}
-                      className="text-xs px-3 py-1.5 rounded-md font-bold"
-                      style={{ backgroundColor: '#2563EB', color: 'white', border: 'none' }}
+                      className="text-xs px-3 py-1.5 rounded-lg font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+                      style={{ backgroundColor: '#0066ff', color: 'white', border: 'none', boxShadow: 'none' }}
                     >
                       {t('Ver comprobante', 'View Receipt')}
                     </button>
+                  ) : membership.latest_payment ? (
+                    <span className="text-xs px-2 py-1" style={{ color: colors.foreground, opacity: 0.5 }}>
+                      {t('Sin comprobante', 'No receipt')}
+                    </span>
                   ) : (
                     <span className="text-xs px-2 py-1" style={{ color: colors.foreground, opacity: 0.5 }}>
                       {t('Sin pagos', 'No payments')}
@@ -526,14 +588,14 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(({ onCreateUser
                 {membership.latest_payment?.status === 'pending' && (
                   <div className="flex gap-2">
                     <button
-                      className="px-4 py-1.5 rounded-md text-xs font-bold transition-colors hover:opacity-90"
-                      style={{ backgroundColor: '#15803D', color: 'white', border: 'none' }}
+                      className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+                      style={{ backgroundColor: '#00CC44', color: 'white', border: 'none', boxShadow: 'none' }}
                     >
                       {t('Aprobar', 'Approve')}
                     </button>
                     <button
-                      className="px-4 py-1.5 rounded-md text-xs font-bold transition-colors hover:opacity-90"
-                      style={{ backgroundColor: '#DC2626', color: 'white', border: 'none' }}
+                      className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+                      style={{ backgroundColor: '#FF3333', color: 'white', border: 'none', boxShadow: 'none' }}
                     >
                       {t('Rechazar', 'Reject')}
                     </button>

@@ -2,7 +2,7 @@ import { loadStripe } from '@stripe/stripe-js';
 
 // Make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the Stripe object on every render.
-let stripePromise: Promise<any>;
+let stripePromise: ReturnType<typeof loadStripe>;
 
 const getStripe = () => {
   if (!stripePromise) {

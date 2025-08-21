@@ -16,7 +16,7 @@ export default function Sidebar({
   activeSection = "memberships",
   onSectionChange 
 }: SidebarProps) {
-  const { theme, toggleTheme, colors, logos } = useTheme();
+  const { theme, toggleTheme, colors } = useTheme();
   const { language, setLanguage } = useLanguage();
   const { gym, signOut } = useAuth();
   const router = useRouter();
@@ -55,10 +55,6 @@ export default function Sidebar({
     {
       id: 'payments',
       label: language === 'es' ? 'PAGOS' : 'PAYMENTS'
-    },
-    {
-      id: 'analytics',
-      label: language === 'es' ? 'ANÁLISIS' : 'ANALYTICS'
     }
   ];
 
@@ -196,7 +192,7 @@ export default function Sidebar({
                     }
                   }}
                 >
-                  <span className="text-sm font-medium uppercase tracking-wide">
+                  <span className="text-base font-medium uppercase tracking-wide">
                     {item.label}
                   </span>
                 </button>
@@ -301,14 +297,14 @@ function MobileMenuContent({
   toggleTheme: () => void;
   language: string;
   setLanguage: (lang: 'en' | 'es') => void;
-  colors: any;
-  gym: any;
+  colors: Record<string, string>;
+  gym: { name?: string } | null;
   signOut: () => Promise<void>;
-  router: any;
+  router: { push: (path: string) => void };
   onClose: () => void;
   activeSection?: string;
   onSectionChange?: (section: string) => void;
-  menuItems: any[];
+  menuItems: { id: string; label: string }[];
 }) {
   return (
     <div className="flex flex-col h-full">
@@ -367,7 +363,7 @@ function MobileMenuContent({
                 fontFamily: 'Romagothic, sans-serif'
               }}
             >
-              <span className="text-sm font-medium uppercase tracking-wide">
+              <span className="text-base font-medium uppercase tracking-wide">
                 {item.label}
               </span>
             </button>

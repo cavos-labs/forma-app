@@ -2,7 +2,7 @@
 export interface User {
   id: string;
   email: string;
-  metadata: any;
+  metadata: Record<string, unknown>;
 }
 
 export interface Gym {
