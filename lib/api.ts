@@ -221,22 +221,6 @@ export interface UpdateUserResponse {
   error?: string;
 }
 
-export interface UpdateMembershipRequest {
-  membershipId: string;
-  monthlyFee: number;
-}
-
-export interface UpdateMembershipResponse {
-  success: boolean;
-  membership?: {
-    id: string;
-    monthly_fee: number;
-    updated_at: string;
-  };
-  message?: string;
-  error?: string;
-}
-
 class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -364,16 +348,6 @@ export const authApi = {
         lastName: data.lastName,
         phone: data.phone,
         dateOfBirth: data.dateOfBirth,
-      }),
-    }),
-
-  updateMembership: (
-    data: UpdateMembershipRequest
-  ): Promise<UpdateMembershipResponse> =>
-    apiRequest(`/api/memberships/${data.membershipId}`, {
-      method: "PATCH",
-      body: JSON.stringify({
-        monthly_fee: data.monthlyFee,
       }),
     }),
 

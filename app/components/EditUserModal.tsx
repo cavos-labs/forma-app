@@ -21,7 +21,7 @@ export interface UserFormData {
   email: string;
   phone: string;
   date_of_birth: string;
-  monthly_fee: number;
+  // Remover monthly_fee
 }
 
 interface FormErrors {
@@ -30,7 +30,7 @@ interface FormErrors {
   email?: string;
   phone?: string;
   date_of_birth?: string;
-  monthly_fee?: string;
+  // Remover monthly_fee
 }
 
 export default function EditUserModal({
@@ -53,7 +53,7 @@ export default function EditUserModal({
     email: "",
     phone: "",
     date_of_birth: "",
-    monthly_fee: 25000,
+    // Remover monthly_fee
   });
 
   // Update form data when membership changes or modal opens
@@ -65,12 +65,12 @@ export default function EditUserModal({
         email: membership.user.email || "",
         phone: membership.user.phone || "",
         date_of_birth: membership.user.date_of_birth || "",
-        monthly_fee: membership.monthly_fee || gym?.monthly_fee || 25000,
+        // Remover monthly_fee
       });
       setErrors({});
       setSuccessMessage("");
     }
-  }, [membership, isOpen, gym?.monthly_fee]);
+  }, [membership, isOpen]);
 
   if (!isOpen || !membership) return null;
 
@@ -117,12 +117,7 @@ export default function EditUserModal({
       }
     }
 
-    if (!formData.monthly_fee || formData.monthly_fee <= 0) {
-      newErrors.monthly_fee =
-        language === "es"
-          ? "La mensualidad debe ser mayor a 0"
-          : "Monthly fee must be greater than 0";
-    }
+    // Remover validación de monthly_fee
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -131,13 +126,9 @@ export default function EditUserModal({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    // Handle monthly_fee as number
-    const processedValue =
-      name === "monthly_fee" ? parseFloat(value) || 0 : value;
-
     setFormData((prev) => ({
       ...prev,
-      [name]: processedValue,
+      [name]: value,
     }));
 
     // Clear error for this field when user starts typing
@@ -168,7 +159,7 @@ export default function EditUserModal({
     setErrors({});
 
     try {
-      // Update user data first
+      // Solo actualizar la información del usuario
       const userResponse = await authApi.updateUser({
         userId: membership.user_id,
         email: formData.email,
@@ -180,20 +171,6 @@ export default function EditUserModal({
 
       if (!userResponse.success) {
         throw new Error(userResponse.error || "Failed to update user");
-      }
-
-      // Update membership monthly fee if it changed
-      if (formData.monthly_fee !== membership.monthly_fee) {
-        const membershipResponse = await authApi.updateMembership({
-          membershipId: membership.id,
-          monthlyFee: formData.monthly_fee,
-        });
-
-        if (!membershipResponse.success) {
-          throw new Error(
-            membershipResponse.error || "Failed to update membership"
-          );
-        }
       }
 
       // Show success message
@@ -340,96 +317,6 @@ export default function EditUserModal({
           </div>
         )}
 
-        {/* Monthly Fee Field */}
-        <div>
-          <label
-            htmlFor="monthly_fee"
-            className="block text-sm font-bold uppercase tracking-widest mb-3"
-            style={{
-              color: colors.foreground,
-              fontFamily: "Romagothic, sans-serif",
-              letterSpacing: "0.1em",
-            }}
-          >
-            {language === "es" ? "MENSUALIDAD" : "MONTHLY FEE"} *
-          </label>
-          <div className="relative">
-            <input
-              type="number"
-              id="monthly_fee"
-              name="monthly_fee"
-              value={formData.monthly_fee}
-              onChange={handleInputChange}
-              min="0"
-              step="1000"
-              placeholder="25000"
-              className="w-full px-4 py-4 pr-20 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200"
-              style={{
-                backgroundColor: colors.inputBackground,
-                color: colors.inputText,
-                border: `2px solid ${
-                  errors.monthly_fee ? "#ef4444" : colors.inputBorder
-                }`,
-                fontSize: "16px",
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = colors.buttonBackground;
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = errors.monthly_fee
-                  ? "#ef4444"
-                  : colors.inputBorder;
-              }}
-            />
-            <div className="absolute right-4 top-4 flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    monthly_fee: gym?.monthly_fee || 25000,
-                  }));
-                  if (errors.monthly_fee) {
-                    setErrors((prev) => ({ ...prev, monthly_fee: undefined }));
-                  }
-                }}
-                className="text-xs px-2 py-1 rounded transition-colors hover:opacity-80"
-                style={{
-                  backgroundColor: colors.buttonBackground,
-                  color: colors.buttonText,
-                }}
-                title={
-                  language === "es"
-                    ? "Restablecer al valor por defecto"
-                    : "Reset to default value"
-                }
-              >
-                {language === "es" ? "Por defecto" : "Default"}
-              </button>
-              <span
-                className="text-sm font-medium"
-                style={{ color: colors.muted }}
-              >
-                CRC
-              </span>
-            </div>
-          </div>
-          {errors.monthly_fee && (
-            <p className="mt-2 text-sm" style={{ color: "#ef4444" }}>
-              {errors.monthly_fee}
-            </p>
-          )}
-          <p className="mt-2 text-xs" style={{ color: colors.muted }}>
-            {language === "es"
-              ? `Mensualidad por defecto del gimnasio: ${formatCurrency(
-                  gym?.monthly_fee || 0
-                )}`
-              : `Gym default monthly fee: ${formatCurrency(
-                  gym?.monthly_fee || 0
-                )}`}
-          </p>
-        </div>
-
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Name fields */}
@@ -517,16 +404,11 @@ export default function EditUserModal({
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = colors.buttonBackground;
-                  e.currentTarget.style.boxShadow =
-                    theme === "dark"
-                      ? "0 0 0 3px rgba(255, 255, 255, 0.1)"
-                      : "0 0 0 3px rgba(55, 55, 55, 0.1)";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = errors.last_name
                     ? "#ef4444"
                     : colors.inputBorder;
-                  e.currentTarget.style.boxShadow = "none";
                 }}
                 placeholder={
                   language === "es" ? "Ingresa el apellido" : "Enter last name"
