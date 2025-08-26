@@ -1,10 +1,11 @@
-import { AuthResponse } from './types';
+import { AuthResponse } from "./types";
 
 // Use local proxy in development, direct URL in production
-const API_URL = process.env.NODE_ENV === 'development' 
-  ? '' // Empty string uses current domain with proxy
-  : process.env.NEXT_PUBLIC_API_URL || 'https://formacr.com';
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
+const API_URL =
+  process.env.NODE_ENV === "development"
+    ? "" // Empty string uses current domain with proxy
+    : process.env.NEXT_PUBLIC_API_URL || "https://formacr.com";
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "";
 
 export interface SignInRequest {
   email: string;
@@ -166,7 +167,7 @@ export interface GetPaymentsResponse {
 
 export interface UpdatePaymentRequest {
   paymentId: string;
-  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  status: "pending" | "approved" | "rejected" | "cancelled";
   rejectionReason?: string;
   notes?: string;
   approvedBy?: string;
@@ -195,47 +196,101 @@ export interface UpdatePaymentResponse {
   error?: string;
 }
 
+export interface UpdateUserRequest {
+  userId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  dateOfBirth?: string;
+}
+
+export interface UpdateUserResponse {
+  success: boolean;
+  user?: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    dateOfBirth?: string;
+    profileImageUrl?: string;
+    updatedAt: string;
+  };
+  message?: string;
+  error?: string;
+}
+
+export interface UpdateMembershipRequest {
+  membershipId: string;
+  monthlyFee: number;
+}
+
+export interface UpdateMembershipResponse {
+  success: boolean;
+  membership?: {
+    id: string;
+    monthly_fee: number;
+    updated_at: string;
+  };
+  message?: string;
+  error?: string;
+}
+
 class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
-    this.name = 'ApiError';
+    this.name = "ApiError";
   }
 }
 
-async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+async function apiRequest<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
   const url = `${API_URL}${endpoint}`;
-  
+
   const config: RequestInit = {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': API_KEY,
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
       ...options.headers,
     },
   };
 
-  console.log('🚀 API Request:', { url, method: config.method, headers: config.headers });
+  console.log("🚀 API Request:", {
+    url,
+    method: config.method,
+    headers: config.headers,
+  });
 
   const response = await fetch(url, config);
-  
-  console.log('📡 API Response:', { 
-    status: response.status, 
+
+  console.log("📡 API Response:", {
+    status: response.status,
     statusText: response.statusText,
-    contentType: response.headers.get('content-type')
+    contentType: response.headers.get("content-type"),
   });
 
   // Check if response is JSON
-  const contentType = response.headers.get('content-type');
-  if (!contentType || !contentType.includes('application/json')) {
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
     const textResponse = await response.text();
-    console.error('❌ Non-JSON Response:', textResponse.substring(0, 200));
-    throw new ApiError(response.status, `Expected JSON but got: ${contentType}. Response: ${textResponse.substring(0, 100)}`);
+    console.error("❌ Non-JSON Response:", textResponse.substring(0, 200));
+    throw new ApiError(
+      response.status,
+      `Expected JSON but got: ${contentType}. Response: ${textResponse.substring(
+        0,
+        100
+      )}`
+    );
   }
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new ApiError(response.status, data.error || 'An error occurred');
+    throw new ApiError(response.status, data.error || "An error occurred");
   }
 
   return data;
@@ -243,38 +298,40 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 
 export const authApi = {
   signIn: (data: SignInRequest): Promise<AuthResponse> =>
-    apiRequest('/api/auth/signin', {
-      method: 'POST',
+    apiRequest("/api/auth/signin", {
+      method: "POST",
       body: JSON.stringify(data),
     }),
 
   signUp: (data: SignUpRequest): Promise<AuthResponse> =>
-    apiRequest('/api/auth/signup', {
-      method: 'POST',
+    apiRequest("/api/auth/signup", {
+      method: "POST",
       body: JSON.stringify(data),
     }),
 
   signOut: (): Promise<{ success: boolean }> =>
-    apiRequest('/api/auth/signout', {
-      method: 'POST',
+    apiRequest("/api/auth/signout", {
+      method: "POST",
     }),
 
   createUser: (data: CreateUserRequest): Promise<CreateUserResponse> =>
-    apiRequest('/api/users', {
-      method: 'POST',
+    apiRequest("/api/users", {
+      method: "POST",
       body: JSON.stringify(data),
     }),
 
-  getMemberships: (params: GetMembershipsRequest): Promise<GetMembershipsResponse> => {
+  getMemberships: (
+    params: GetMembershipsRequest
+  ): Promise<GetMembershipsResponse> => {
     const searchParams = new URLSearchParams({
       gymId: params.gymId,
       ...(params.limit && { limit: params.limit.toString() }),
       ...(params.offset && { offset: params.offset.toString() }),
       ...(params.status && { status: params.status }),
     });
-    
+
     return apiRequest(`/api/memberships?${searchParams.toString()}`, {
-      method: 'GET',
+      method: "GET",
     });
   },
 
@@ -286,27 +343,49 @@ export const authApi = {
       ...(params.status && { status: params.status }),
       ...(params.membershipId && { membershipId: params.membershipId }),
     });
-    
+
     return apiRequest(`/api/payments?${searchParams.toString()}`, {
-      method: 'GET',
+      method: "GET",
     });
   },
 
   updatePayment: (data: UpdatePaymentRequest): Promise<UpdatePaymentResponse> =>
-    apiRequest('/api/payments', {
-      method: 'PATCH',
+    apiRequest("/api/payments", {
+      method: "PATCH",
       body: JSON.stringify(data),
+    }),
+
+  updateUser: (data: UpdateUserRequest): Promise<UpdateUserResponse> =>
+    apiRequest(`/api/users/${data.userId}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        email: data.email, // Incluir si quieres actualizar email
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phone: data.phone,
+        dateOfBirth: data.dateOfBirth,
+      }),
+    }),
+
+  updateMembership: (
+    data: UpdateMembershipRequest
+  ): Promise<UpdateMembershipResponse> =>
+    apiRequest(`/api/memberships/${data.membershipId}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        monthly_fee: data.monthlyFee,
+      }),
     }),
 
   // Test endpoint to debug proxy issues
   testUsersEndpoint: (): Promise<unknown> =>
-    apiRequest('/api/users', {
-      method: 'POST',
+    apiRequest("/api/users", {
+      method: "POST",
       body: JSON.stringify({
-        email: 'test@test.com',
-        firstName: 'Test',
-        lastName: 'User',
-        gymId: 'test-gym-id'
+        email: "test@test.com",
+        firstName: "Test",
+        lastName: "User",
+        gymId: "test-gym-id",
       }),
     }),
 };
