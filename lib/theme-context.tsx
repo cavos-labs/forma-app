@@ -26,6 +26,9 @@ interface ThemeContextType {
     primary: string;
     card: string;
     border: string;
+    text: string;
+    mutedText: string;
+    cardBackground: string;
   };
   logos: {
     leftLogo: string;
@@ -54,6 +57,9 @@ function getThemeColors(theme: Theme) {
       primary: '#f0f0f0',
       card: '#1f1f1f',
       border: '#404040',
+      text: '#ededed',
+      mutedText: '#a1a1aa',
+      cardBackground: '#1f1f1f',
     };
   }
   
@@ -76,6 +82,9 @@ function getThemeColors(theme: Theme) {
     primary: '#373737',
     card: '#f9fafb',
     border: '#d1d5db',
+    text: '#373737',
+    mutedText: '#666666',
+    cardBackground: '#f9fafb',
   };
 }
 

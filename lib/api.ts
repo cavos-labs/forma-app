@@ -243,25 +243,14 @@ async function apiRequest<T>(
     },
   };
 
-  console.log("🚀 API Request:", {
-    url,
-    method: config.method,
-    headers: config.headers,
-  });
 
   const response = await fetch(url, config);
 
-  console.log("📡 API Response:", {
-    status: response.status,
-    statusText: response.statusText,
-    contentType: response.headers.get("content-type"),
-  });
 
   // Check if response is JSON
   const contentType = response.headers.get("content-type");
   if (!contentType || !contentType.includes("application/json")) {
     const textResponse = await response.text();
-    console.error("❌ Non-JSON Response:", textResponse.substring(0, 200));
     throw new ApiError(
       response.status,
       `Expected JSON but got: ${contentType}. Response: ${textResponse.substring(
@@ -361,6 +350,94 @@ export const authApi = {
         lastName: "User",
         gymId: "test-gym-id",
       }),
+    }),
+};
+
+// Daily Workouts API
+export interface GetWorkoutsRequest {
+  gymId: string;
+  year?: string;
+  month?: string;
+}
+
+export interface GetWorkoutsResponse {
+  success: boolean;
+  workouts: Array<{
+    id: string;
+    gym_id: string;
+    workout_date: string;
+    workout_text: string;
+    created_at: string;
+    updated_at: string;
+  }>;
+  error?: string;
+}
+
+export interface CreateWorkoutRequest {
+  gym_id: string;
+  workout_date: string;
+  workout_text: string;
+}
+
+export interface CreateWorkoutResponse {
+  success: boolean;
+  workout: {
+    id: string;
+    gym_id: string;
+    workout_date: string;
+    workout_text: string;
+    created_at: string;
+    updated_at: string;
+  };
+  error?: string;
+}
+
+export interface UpdateWorkoutRequest {
+  id: string;
+  workout_text: string;
+}
+
+export interface UpdateWorkoutResponse {
+  success: boolean;
+  workout: {
+    id: string;
+    gym_id: string;
+    workout_date: string;
+    workout_text: string;
+    created_at: string;
+    updated_at: string;
+  };
+  error?: string;
+}
+
+export const workoutApi = {
+  getWorkouts: (params: GetWorkoutsRequest): Promise<GetWorkoutsResponse> => {
+    const searchParams = new URLSearchParams({
+      gym_id: params.gymId,
+      ...(params.year && { year: params.year }),
+      ...(params.month && { month: params.month }),
+    });
+
+    return apiRequest(`/api/daily-workouts?${searchParams.toString()}`, {
+      method: "GET",
+    });
+  },
+
+  createWorkout: (data: CreateWorkoutRequest): Promise<CreateWorkoutResponse> =>
+    apiRequest("/api/daily-workouts", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  updateWorkout: (data: UpdateWorkoutRequest): Promise<UpdateWorkoutResponse> =>
+    apiRequest("/api/daily-workouts", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+
+  deleteWorkout: (id: string): Promise<{ success: boolean; message: string }> =>
+    apiRequest(`/api/daily-workouts?id=${id}`, {
+      method: "DELETE",
     }),
 };
 

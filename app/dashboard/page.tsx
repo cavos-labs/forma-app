@@ -5,6 +5,7 @@ import { useTheme } from "@/lib/theme-context";
 import Sidebar from "@/app/components/Sidebar";
 import Memberships, { type MembershipsRef } from "@/app/components/Memberships";
 import Payments from "@/app/components/Payments";
+import Classes, { type ClassesRef } from "@/app/components/Classes";
 import CreateUserModal from "@/app/components/CreateUserModal";
 import EditUserModal from "@/app/components/EditUserModal";
 import ReceiptModal from "@/app/components/ReceiptModal";
@@ -33,6 +34,7 @@ export default function AdminDashboard() {
   } | null>(null);
 
   const membershipsRef = useRef<MembershipsRef>(null);
+  const classesRef = useRef<ClassesRef>(null);
 
   const handleCreateUser = () => {
     setIsCreateUserModalOpen(true);
@@ -64,6 +66,8 @@ export default function AdminDashboard() {
         );
       case "payments":
         return <Payments />;
+      case "classes":
+        return <Classes ref={classesRef} />;
       default:
         return (
           <Memberships

@@ -32,6 +32,10 @@ const nextConfig = {
         source: '/api/payments/:path*',
         destination: 'https://formacr.com/api/payments/:path*',
       },
+      {
+        source: '/api/daily-workouts/:path*',
+        destination: 'https://formacr.com/api/daily-workouts/:path*',
+      },
       // General fallback for any other API routes
       {
         source: '/api/:path*',

@@ -55,6 +55,10 @@ export default function Sidebar({
     {
       id: 'payments',
       label: language === 'es' ? 'PAGOS' : 'PAYMENTS'
+    },
+    {
+      id: 'classes',
+      label: language === 'es' ? 'ENTRENAMIENTOS' : 'WORKOUTS'
     }
   ];
 

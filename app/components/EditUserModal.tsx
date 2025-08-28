@@ -208,12 +208,6 @@ export default function EditUserModal({
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("es-CR", {
-      style: "currency",
-      currency: "CRC",
-    }).format(amount);
-  };
 
   return (
     <div
