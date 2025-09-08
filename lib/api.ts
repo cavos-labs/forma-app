@@ -33,6 +33,7 @@ export interface CreateUserRequest {
   dateOfBirth?: string;
   gymId: string;
   monthlyFee?: number;
+  startDate?: string;
 }
 
 export interface CreateUserResponse {
@@ -243,9 +244,7 @@ async function apiRequest<T>(
     },
   };
 
-
   const response = await fetch(url, config);
-
 
   // Check if response is JSON
   const contentType = response.headers.get("content-type");
