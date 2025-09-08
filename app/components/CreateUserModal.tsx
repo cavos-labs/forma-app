@@ -20,6 +20,7 @@ export interface UserFormData {
   phone: string;
   date_of_birth: string;
   monthly_fee: number;
+  start_date: string;
 }
 
 interface FormErrors {
@@ -29,6 +30,7 @@ interface FormErrors {
   phone?: string;
   date_of_birth?: string;
   monthly_fee?: string;
+  start_date?: string;
 }
 
 export default function CreateUserModal({ isOpen, onClose, onSave, onSuccess }: CreateUserModalProps) {
@@ -45,7 +47,8 @@ export default function CreateUserModal({ isOpen, onClose, onSave, onSuccess }: 
     email: '',
     phone: '',
     date_of_birth: '',
-    monthly_fee: gym?.monthly_fee || 25000
+    monthly_fee: gym?.monthly_fee || 25000,
+    start_date: new Date().toISOString().split('T')[0] // Default to today
   }));
 
   // Update monthly_fee when gym changes or modal opens
@@ -90,6 +93,20 @@ export default function CreateUserModal({ isOpen, onClose, onSave, onSuccess }: 
 
     if (!formData.monthly_fee || formData.monthly_fee <= 0) {
       newErrors.monthly_fee = language === 'es' ? 'La mensualidad debe ser mayor a 0' : 'Monthly fee must be greater than 0';
+    }
+
+    if (!formData.start_date) {
+      newErrors.start_date = language === 'es' ? 'La fecha de inicio es requerida' : 'Start date is required';
+    } else {
+      const startDate = new Date(formData.start_date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to start of day
+      
+      if (startDate < today) {
+        newErrors.start_date = language === 'es' 
+          ? 'La fecha de inicio no puede ser anterior a hoy' 
+          : 'Start date cannot be before today';
+      }
     }
 
     setErrors(newErrors);
@@ -138,6 +155,7 @@ export default function CreateUserModal({ isOpen, onClose, onSave, onSuccess }: 
         dateOfBirth: formData.date_of_birth || undefined,
         gymId: gym.id,
         monthlyFee: formData.monthly_fee,
+        startDate: formData.start_date,
       });
 
       if (response.success) {
@@ -171,7 +189,8 @@ export default function CreateUserModal({ isOpen, onClose, onSave, onSuccess }: 
             email: '',
             phone: '',
             date_of_birth: '',
-            monthly_fee: gym?.monthly_fee || 25000
+            monthly_fee: gym?.monthly_fee || 25000,
+            start_date: new Date().toISOString().split('T')[0]
           });
           setSuccessMessage('');
           onClose();
@@ -352,6 +371,57 @@ export default function CreateUserModal({ isOpen, onClose, onSave, onSuccess }: 
               {language === 'es' 
                 ? `Mensualidad por defecto del gimnasio: ${formatCurrency(gym?.monthly_fee || 0)}`
                 : `Gym default monthly fee: ${formatCurrency(gym?.monthly_fee || 0)}`
+              }
+            </p>
+          </div>
+
+          {/* Start Date Field */}
+          <div>
+            <label 
+              htmlFor="start_date" 
+              className="block text-sm font-bold uppercase tracking-widest mb-3" 
+              style={{ 
+                color: colors.foreground,
+                fontFamily: 'Romagothic, sans-serif',
+                letterSpacing: '0.1em'
+              }}
+            >
+              {language === 'es' ? 'FECHA DE INICIO' : 'START DATE'} *
+            </label>
+            <input
+              type="date"
+              id="start_date"
+              name="start_date"
+              value={formData.start_date}
+              onChange={handleInputChange}
+              min={new Date().toISOString().split('T')[0]}
+              className="w-full px-4 py-4 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200"
+              style={{ 
+                backgroundColor: colors.inputBackground,
+                color: colors.inputText,
+                border: `2px solid ${errors.start_date ? '#ef4444' : colors.inputBorder}`,
+                fontSize: '16px'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = colors.buttonBackground;
+                e.currentTarget.style.boxShadow = theme === 'dark' 
+                  ? '0 0 0 3px rgba(255, 255, 255, 0.1)'
+                  : '0 0 0 3px rgba(55, 55, 55, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = errors.start_date ? '#ef4444' : colors.inputBorder;
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            />
+            {errors.start_date && (
+              <p className="text-sm mt-2 font-medium" style={{ color: '#ef4444' }}>
+                {errors.start_date}
+              </p>
+            )}
+            <p className="mt-2 text-xs" style={{ color: colors.muted }}>
+              {language === 'es' 
+                ? 'Fecha cuando el usuario comenzará su membresía'
+                : 'Date when the user will start their membership'
               }
             </p>
           </div>
