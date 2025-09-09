@@ -91,6 +91,7 @@ export interface GetMembershipsResponse {
       phone: string | null;
       date_of_birth: string | null;
       profile_image_url: string | null;
+      gender?: string; // Optional for backward compatibility
       created_at: string;
     };
     latest_payment: {
@@ -158,6 +159,7 @@ export interface GetPaymentsResponse {
       phone: string | null;
       date_of_birth: string | null;
       profile_image_url: string | null;
+      gender?: string; // Optional for backward compatibility
     };
   }>;
   pagination: {

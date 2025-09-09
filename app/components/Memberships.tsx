@@ -10,7 +10,7 @@ import {
 import { useTheme } from "@/lib/theme-context";
 import { useLanguage } from "@/lib/language-context";
 import { useAuth } from "@/lib/auth-context";
-import { MembershipData, MembershipStatus, PaymentStatus } from "@/lib/types";
+import { MembershipData, MembershipStatus, PaymentStatus, Gender } from "@/lib/types";
 import { authApi, ApiError } from "@/lib/api";
 import ReceiptModal from "./ReceiptModal";
 import EditUserModal from "./EditUserModal";
@@ -34,6 +34,7 @@ const mockMemberships: MembershipData[] = [
       phone: "+506 8888-8888",
       date_of_birth: "1990-03-15",
       profile_image_url: null,
+      gender: "female",
     },
     latest_payment: {
       id: "payment-1",
@@ -62,6 +63,7 @@ const mockMemberships: MembershipData[] = [
       phone: "+506 7777-7777",
       date_of_birth: "1985-11-22",
       profile_image_url: null,
+      gender: "male",
     },
     latest_payment: {
       id: "payment-2",
@@ -90,6 +92,7 @@ const mockMemberships: MembershipData[] = [
       phone: "+506 6666-6666",
       date_of_birth: "1992-08-07",
       profile_image_url: null,
+      gender: "female",
     },
     latest_payment: {
       id: "payment-3",
@@ -118,6 +121,7 @@ const mockMemberships: MembershipData[] = [
       phone: null,
       date_of_birth: "1988-12-03",
       profile_image_url: null,
+      gender: "male",
     },
     latest_payment: {
       id: "payment-4",
@@ -203,6 +207,7 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
                 phone: membership.user.phone,
                 date_of_birth: membership.user.date_of_birth,
                 profile_image_url: membership.user.profile_image_url,
+                gender: (membership.user.gender as Gender) || "unspecified",
               },
               latest_payment: membership.latest_payment
                 ? {
