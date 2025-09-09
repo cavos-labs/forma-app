@@ -3,28 +3,29 @@ export const translations = {
     // Header
     formaSystem: "FORMA SYSTEM",
     gymManagement: "Gym",
-    madeSmart: "Management", 
+    madeSmart: "Management",
     madeSimple: "Made Simple",
-    formaDescription: "Complete membership management, automated payments, and real-time analytics. Everything you need to run your gym efficiently.",
-    
+    formaDescription:
+      "Complete membership management, automated payments, and real-time analytics. Everything you need to run your gym efficiently.",
+
     // Auth Forms
     welcomeBack: "Welcome Back",
     createAccount: "Create Account",
     loginSubtitle: "Enter your email and password to access your account",
     signupSubtitle: "Set up your gym management account",
-    
+
     // Form Fields
     firstName: "First Name",
     lastName: "Last Name",
     gymName: "Gym Name",
-    gymAddress: "Gym Address", 
+    gymAddress: "Gym Address",
     gymPhone: "Gym Phone",
     gymEmail: "Gym Email",
     monthlyFee: "Monthly Fee (₡)",
     sinpePhone: "SINPE Phone",
     email: "Email",
     password: "Password",
-    
+
     // Placeholders
     firstNamePlaceholder: "John",
     lastNamePlaceholder: "Doe",
@@ -36,7 +37,7 @@ export const translations = {
     sinpePhonePlaceholder: "88888888",
     emailPlaceholder: "Enter your email",
     passwordPlaceholder: "Enter your password",
-    
+
     // Actions
     signIn: "Sign In",
     signUp: "Sign Up",
@@ -44,19 +45,20 @@ export const translations = {
     rememberMe: "Remember me",
     forgotPassword: "Forgot Password?",
     loading: "Loading...",
-    
+
     // Navigation
     dontHaveAccount: "Don't have an account? ",
     alreadyHaveAccount: "Already have an account? ",
-    
+
     // Messages
     accountCreatedSuccess: "Account created successfully!",
     loginSuccess: "Login successful!",
     unexpectedError: "An unexpected error occurred. Please try again.",
-    
+
     // Pricing Page
     pricingTitle: "Choose Your Plan",
-    pricingSubtitle: "Activate your gym management system with one of our flexible plans",
+    pricingSubtitle:
+      "Activate your gym management system with one of our flexible plans",
     monthlyPlan: "Monthly Plan",
     yearlyPlan: "Yearly Plan",
     monthlyPrice: "₡27,500",
@@ -69,20 +71,22 @@ export const translations = {
     planFeatures: "Plan Features",
     feature1: "Complete membership management",
     feature2: "Automated SINPE payments",
-    feature3: "Real-time analytics and reports", 
+    feature3: "Real-time analytics and reports",
     feature4: "Access control system",
     feature5: "Customer support",
     feature6: "Regular updates",
     backToLogin: "Back to Login",
     gymInactive: "Your gym is currently inactive",
-    activateMessage: "Please select a plan to activate your gym management system",
+    activateMessage:
+      "Please select a plan to activate your gym management system",
     paymentError: "Error processing payment. Please try again.",
     paymentSuccessful: "Payment Successful!",
-    gymActivated: "Your gym has been activated. You can now access all features of the Forma management system.",
+    gymActivated:
+      "Your gym has been activated. You can now access all features of the Forma management system.",
     continueToDashboard: "Continue to Dashboard",
     processingPayment: "Processing Payment...",
     pleaseWait: "Please wait while we confirm your payment",
-    
+
     // Dashboard
     dashboard: "Dashboard",
     signOut: "Sign Out",
@@ -92,7 +96,8 @@ export const translations = {
     monthlyRevenue: "Monthly Revenue",
     pendingPayments: "Pending Payments",
     memberManagement: "Member Management",
-    memberManagementDesc: "Add, edit, and manage gym members and their memberships",
+    memberManagementDesc:
+      "Add, edit, and manage gym members and their memberships",
     paymentProcessing: "Payment Processing",
     paymentProcessingDesc: "Review and approve SINPE payments from members",
     analytics: "Analytics & Reports",
@@ -103,33 +108,41 @@ export const translations = {
     settingsDesc: "Configure your gym settings and preferences",
     support: "Support",
     supportDesc: "Get help and contact our support team",
+
+    // Gender options
+    gender: "Gender",
+    male: "Male",
+    female: "Female",
+    unspecified: "Unspecified",
+    selectGender: "Select gender",
   },
   es: {
     // Header
     formaSystem: "SISTEMA FORMA",
     gymManagement: "Gestión de",
-    madeSmart: "Gimnasios", 
+    madeSmart: "Gimnasios",
     madeSimple: "Simplificada",
-    formaDescription: "Gestión completa de membresías, pagos automatizados y análisis en tiempo real. Todo lo que necesitas para administrar tu gimnasio eficientemente.",
-    
+    formaDescription:
+      "Gestión completa de membresías, pagos automatizados y análisis en tiempo real. Todo lo que necesitas para administrar tu gimnasio eficientemente.",
+
     // Auth Forms
     welcomeBack: "Bienvenido de Vuelta",
     createAccount: "Crear Cuenta",
     loginSubtitle: "Ingresa tu email y contraseña para acceder a tu cuenta",
     signupSubtitle: "Configura tu cuenta de gestión de gimnasio",
-    
+
     // Form Fields
     firstName: "Nombre",
     lastName: "Apellido",
     gymName: "Nombre del Gimnasio",
     gymAddress: "Dirección del Gimnasio",
-    gymPhone: "Teléfono del Gimnasio", 
+    gymPhone: "Teléfono del Gimnasio",
     gymEmail: "Email del Gimnasio",
     monthlyFee: "Cuota Mensual (₡)",
     sinpePhone: "Teléfono SINPE",
     email: "Email",
     password: "Contraseña",
-    
+
     // Placeholders
     firstNamePlaceholder: "Juan",
     lastNamePlaceholder: "Pérez",
@@ -141,7 +154,7 @@ export const translations = {
     sinpePhonePlaceholder: "88888888",
     emailPlaceholder: "Ingresa tu email",
     passwordPlaceholder: "Ingresa tu contraseña",
-    
+
     // Actions
     signIn: "Iniciar Sesión",
     signUp: "Registrarse",
@@ -149,19 +162,20 @@ export const translations = {
     rememberMe: "Recordarme",
     forgotPassword: "¿Olvidaste tu contraseña?",
     loading: "Cargando...",
-    
+
     // Navigation
     dontHaveAccount: "¿No tienes una cuenta? ",
     alreadyHaveAccount: "¿Ya tienes una cuenta? ",
-    
+
     // Messages
     accountCreatedSuccess: "¡Cuenta creada exitosamente!",
     loginSuccess: "¡Inicio de sesión exitoso!",
     unexpectedError: "Ocurrió un error inesperado. Por favor intenta de nuevo.",
-    
+
     // Pricing Page
     pricingTitle: "Elige Tu Plan",
-    pricingSubtitle: "Activa tu sistema de gestión de gimnasio con uno de nuestros planes flexibles",
+    pricingSubtitle:
+      "Activa tu sistema de gestión de gimnasio con uno de nuestros planes flexibles",
     monthlyPlan: "Plan Mensual",
     yearlyPlan: "Plan Anual",
     monthlyPrice: "₡27.500",
@@ -180,14 +194,16 @@ export const translations = {
     feature6: "Actualizaciones regulares",
     backToLogin: "Volver al Login",
     gymInactive: "Tu gimnasio está actualmente inactivo",
-    activateMessage: "Por favor selecciona un plan para activar tu sistema de gestión de gimnasio",
+    activateMessage:
+      "Por favor selecciona un plan para activar tu sistema de gestión de gimnasio",
     paymentError: "Error procesando el pago. Por favor intenta de nuevo.",
     paymentSuccessful: "¡Pago Exitoso!",
-    gymActivated: "Tu gimnasio ha sido activado. Ahora puedes acceder a todas las características del sistema de gestión Forma.",
+    gymActivated:
+      "Tu gimnasio ha sido activado. Ahora puedes acceder a todas las características del sistema de gestión Forma.",
     continueToDashboard: "Continuar al Dashboard",
     processingPayment: "Procesando Pago...",
     pleaseWait: "Por favor espera mientras confirmamos tu pago",
-    
+
     // Dashboard
     dashboard: "Dashboard",
     signOut: "Cerrar Sesión",
@@ -197,29 +213,38 @@ export const translations = {
     monthlyRevenue: "Ingresos Mensuales",
     pendingPayments: "Pagos Pendientes",
     memberManagement: "Gestión de Miembros",
-    memberManagementDesc: "Agregar, editar y gestionar miembros del gimnasio y sus membresías",
+    memberManagementDesc:
+      "Agregar, editar y gestionar miembros del gimnasio y sus membresías",
     paymentProcessing: "Procesamiento de Pagos",
     paymentProcessingDesc: "Revisar y aprobar pagos SINPE de los miembros",
     analytics: "Análisis y Reportes",
     analyticsDesc: "Ver reportes detallados y análisis sobre tu gimnasio",
     accessControl: "Control de Acceso",
-    accessControlDesc: "Gestionar el acceso de miembros y rastrear registros de entrada",
+    accessControlDesc:
+      "Gestionar el acceso de miembros y rastrear registros de entrada",
     settings: "Configuraciones",
     settingsDesc: "Configurar ajustes y preferencias de tu gimnasio",
     support: "Soporte",
     supportDesc: "Obtener ayuda y contactar a nuestro equipo de soporte",
-  }
+
+    // Gender options
+    gender: "Género",
+    male: "Masculino",
+    female: "Femenino",
+    unspecified: "No especificado",
+    selectGender: "Seleccionar género",
+  },
 };
 
 export type Language = keyof typeof translations;
 export type TranslationKey = keyof typeof translations.en;
 
 export function detectBrowserLanguage(): Language {
-  if (typeof window === 'undefined') return 'en';
-  
+  if (typeof window === "undefined") return "en";
+
   const browserLang = navigator.language.toLowerCase();
-  if (browserLang.startsWith('es')) {
-    return 'es';
+  if (browserLang.startsWith("es")) {
+    return "es";
   }
-  return 'en';
+  return "en";
 }
