@@ -31,6 +31,7 @@ export interface CreateUserRequest {
   lastName: string;
   phone?: string;
   dateOfBirth?: string;
+  gender?: "male" | "female" | "unspecified";
   gymId: string;
   monthlyFee?: number;
   startDate?: string;
@@ -46,6 +47,7 @@ export interface CreateUserResponse {
     lastName: string;
     phone?: string;
     dateOfBirth?: string;
+    gender?: "male" | "female" | "unspecified";
     profileImageUrl?: string;
     createdAt: string;
   };
@@ -204,6 +206,7 @@ export interface UpdateUserRequest {
   lastName: string;
   phone?: string;
   dateOfBirth?: string;
+  gender?: "male" | "female" | "unspecified";
 }
 
 export interface UpdateUserResponse {
@@ -215,6 +218,7 @@ export interface UpdateUserResponse {
     lastName: string;
     phone?: string;
     dateOfBirth?: string;
+    gender?: "male" | "female" | "unspecified";
     profileImageUrl?: string;
     updatedAt: string;
   };
@@ -336,6 +340,7 @@ export const authApi = {
         lastName: data.lastName,
         phone: data.phone,
         dateOfBirth: data.dateOfBirth,
+        gender: data.gender,
       }),
     }),
 

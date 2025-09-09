@@ -5,6 +5,7 @@ import { useTheme } from "@/lib/theme-context";
 import { useLanguage } from "@/lib/language-context";
 import { useAuth } from "@/lib/auth-context";
 import { authApi, ApiError } from "@/lib/api";
+import { Gender } from "@/lib/types";
 
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export interface UserFormData {
   email: string;
   phone: string;
   date_of_birth: string;
+  gender: Gender;
   monthly_fee: number;
   start_date: string;
 }
@@ -29,6 +31,7 @@ interface FormErrors {
   email?: string;
   phone?: string;
   date_of_birth?: string;
+  gender?: string;
   monthly_fee?: string;
   start_date?: string;
 }
@@ -52,6 +55,7 @@ export default function CreateUserModal({
     email: "",
     phone: "",
     date_of_birth: "",
+    gender: "unspecified",
     monthly_fee: gym?.monthly_fee || 25000,
     start_date: new Date().toISOString().split("T")[0],
   }));
@@ -137,7 +141,9 @@ export default function CreateUserModal({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
 
     const processedValue =
@@ -181,6 +187,7 @@ export default function CreateUserModal({
         lastName: formData.last_name,
         phone: formData.phone || undefined,
         dateOfBirth: formData.date_of_birth || undefined,
+        gender: formData.gender,
         gymId: gym.id,
         monthlyFee: formData.monthly_fee,
         startDate: formData.start_date,
@@ -215,6 +222,7 @@ export default function CreateUserModal({
             email: "",
             phone: "",
             date_of_birth: "",
+            gender: "unspecified",
             monthly_fee: gym?.monthly_fee || 25000,
             start_date: new Date().toISOString().split("T")[0],
           });
@@ -247,6 +255,16 @@ export default function CreateUserModal({
       currency: "CRC",
     }).format(amount);
   };
+
+  const genderOptions: { value: Gender; label: { en: string; es: string } }[] =
+    [
+      { value: "male", label: { en: "Male", es: "Masculino" } },
+      { value: "female", label: { en: "Female", es: "Femenino" } },
+      {
+        value: "unspecified",
+        label: { en: "Unspecified", es: "No especificado" },
+      },
+    ];
 
   return (
     <div
@@ -686,64 +704,134 @@ export default function CreateUserModal({
                 </div>
               </div>
 
-              {/* Date of Birth */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="date_of_birth"
-                  className="block text-sm font-semibold uppercase tracking-wider"
-                  style={{
-                    color: colors.foreground,
-                    fontFamily: "Romagothic, sans-serif",
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  {language === "es" ? "FECHA DE NACIMIENTO" : "DATE OF BIRTH"}
-                </label>
-                <input
-                  type="date"
-                  id="date_of_birth"
-                  name="date_of_birth"
-                  value={formData.date_of_birth}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200"
-                  style={{
-                    backgroundColor: colors.inputBackground,
-                    color: colors.inputText,
-                    border: `2px solid ${
-                      errors.date_of_birth ? "#ef4444" : colors.inputBorder
-                    }`,
-                    fontSize: "16px",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = colors.buttonBackground;
-                    e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.buttonBackground}20`;
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = errors.date_of_birth
-                      ? "#ef4444"
-                      : colors.inputBorder;
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                />
-                {errors.date_of_birth && (
-                  <p
-                    className="text-sm font-medium flex items-center"
-                    style={{ color: "#ef4444" }}
+              {/* Date of Birth and Gender */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label
+                    htmlFor="date_of_birth"
+                    className="block text-sm font-semibold uppercase tracking-wider"
+                    style={{
+                      color: colors.foreground,
+                      fontFamily: "Romagothic, sans-serif",
+                      letterSpacing: "0.05em",
+                    }}
                   >
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
+                    {language === "es"
+                      ? "FECHA DE NACIMIENTO"
+                      : "DATE OF BIRTH"}
+                  </label>
+                  <input
+                    type="date"
+                    id="date_of_birth"
+                    name="date_of_birth"
+                    value={formData.date_of_birth}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200"
+                    style={{
+                      backgroundColor: colors.inputBackground,
+                      color: colors.inputText,
+                      border: `2px solid ${
+                        errors.date_of_birth ? "#ef4444" : colors.inputBorder
+                      }`,
+                      fontSize: "16px",
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor =
+                        colors.buttonBackground;
+                      e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.buttonBackground}20`;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = errors.date_of_birth
+                        ? "#ef4444"
+                        : colors.inputBorder;
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  />
+                  {errors.date_of_birth && (
+                    <p
+                      className="text-sm font-medium flex items-center"
+                      style={{ color: "#ef4444" }}
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    {errors.date_of_birth}
-                  </p>
-                )}
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {errors.date_of_birth}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="gender"
+                    className="block text-sm font-semibold uppercase tracking-wider"
+                    style={{
+                      color: colors.foreground,
+                      fontFamily: "Romagothic, sans-serif",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    {language === "es" ? "GÉNERO" : "GENDER"}
+                  </label>
+                  <select
+                    id="gender"
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200"
+                    style={{
+                      backgroundColor: colors.inputBackground,
+                      color: colors.inputText,
+                      border: `2px solid ${
+                        errors.gender ? "#ef4444" : colors.inputBorder
+                      }`,
+                      fontSize: "16px",
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor =
+                        colors.buttonBackground;
+                      e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.buttonBackground}20`;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = errors.gender
+                        ? "#ef4444"
+                        : colors.inputBorder;
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    {genderOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {language === "es" ? option.label.es : option.label.en}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.gender && (
+                    <p
+                      className="text-sm font-medium flex items-center"
+                      style={{ color: "#ef4444" }}
+                    >
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {errors.gender}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
