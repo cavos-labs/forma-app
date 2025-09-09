@@ -33,6 +33,7 @@ export interface CreateUserRequest {
   dateOfBirth?: string;
   gymId: string;
   monthlyFee?: number;
+  gender?: "male" | "female" | "unspecified";
 }
 
 export interface CreateUserResponse {
@@ -47,6 +48,7 @@ export interface CreateUserResponse {
     dateOfBirth?: string;
     profileImageUrl?: string;
     createdAt: string;
+    gender?: "male" | "female" | "unspecified";
   };
   membership?: {
     id: string;
@@ -203,6 +205,7 @@ export interface UpdateUserRequest {
   lastName: string;
   phone?: string;
   dateOfBirth?: string;
+  gender?: "male" | "female" | "unspecified";
 }
 
 export interface UpdateUserResponse {
@@ -216,6 +219,7 @@ export interface UpdateUserResponse {
     dateOfBirth?: string;
     profileImageUrl?: string;
     updatedAt: string;
+    gender?: "male" | "female" | "unspecified";
   };
   message?: string;
   error?: string;
@@ -243,9 +247,7 @@ async function apiRequest<T>(
     },
   };
 
-
   const response = await fetch(url, config);
-
 
   // Check if response is JSON
   const contentType = response.headers.get("content-type");
@@ -337,6 +339,7 @@ export const authApi = {
         lastName: data.lastName,
         phone: data.phone,
         dateOfBirth: data.dateOfBirth,
+        gender: data.gender,
       }),
     }),
 

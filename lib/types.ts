@@ -32,8 +32,13 @@ export interface AuthResponse {
 }
 
 // Membership and payment types based on database schema
-export type MembershipStatus = 'pending_payment' | 'active' | 'expired' | 'inactive' | 'cancelled';
-export type PaymentStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+export type MembershipStatus =
+  | "pending_payment"
+  | "active"
+  | "expired"
+  | "inactive"
+  | "cancelled";
+export type PaymentStatus = "pending" | "approved" | "rejected" | "cancelled";
 
 export interface MembershipData {
   id: string;
@@ -53,6 +58,7 @@ export interface MembershipData {
     phone: string | null;
     date_of_birth: string | null;
     profile_image_url: string | null;
+    gender?: "male" | "female" | "unspecified";
   };
   // Latest payment data
   latest_payment: {
