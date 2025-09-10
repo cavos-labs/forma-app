@@ -10,7 +10,12 @@ import {
 import { useTheme } from "@/lib/theme-context";
 import { useLanguage } from "@/lib/language-context";
 import { useAuth } from "@/lib/auth-context";
-import { MembershipData, MembershipStatus, PaymentStatus, Gender } from "@/lib/types";
+import {
+  MembershipData,
+  MembershipStatus,
+  PaymentStatus,
+  Gender,
+} from "@/lib/types";
 import { authApi, ApiError } from "@/lib/api";
 import ReceiptModal from "./ReceiptModal";
 import EditUserModal from "./EditUserModal";
@@ -165,6 +170,7 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
     const [searchQuery, setSearchQuery] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isResendingLink, setIsResendingLink] = useState<string | null>(null);
 
     // Translation function
     const t = useCallback(
@@ -367,6 +373,22 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
       expired: memberships.filter((m) => m.status === "expired").length,
       inactive: memberships.filter((m) => m.status === "inactive").length,
       cancelled: memberships.filter((m) => m.status === "cancelled").length,
+    };
+
+    const handleResendPaymentLink = async (membershipId: string) => {
+      setIsResendingLink(membershipId);
+      try {
+        const response = await authApi.sendPaymentLink({ membershipId });
+        if (response.success) {
+          // Show success message (you might want to add a toast notification)
+          console.log("Payment link sent successfully");
+        }
+      } catch (err) {
+        console.error("Error sending payment link:", err);
+        // Handle error (you might want to add error notification)
+      } finally {
+        setIsResendingLink(null);
+      }
     };
 
     return (
@@ -728,6 +750,27 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
                         >
                           {t("Sin pagos", "No payments")}
                         </span>
+                      )}
+                      {membership.status !== "active" && (
+                        <button
+                          onClick={() => handleResendPaymentLink(membership.id)}
+                          disabled={isResendingLink === membership.id}
+                          className="text-xs px-3 py-1.5 rounded-lg font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 disabled:opacity-50"
+                          style={{
+                            backgroundColor: "#8B5CF6",
+                            color: "white",
+                            border: "none",
+                            boxShadow: "none",
+                          }}
+                          title={t(
+                            "Reenviar enlace de pago",
+                            "Resend payment link"
+                          )}
+                        >
+                          {isResendingLink === membership.id
+                            ? t("Enviando...", "Sending...")
+                            : t("Reenviar Enlace", "Resend Link")}
+                        </button>
                       )}
                     </div>
 

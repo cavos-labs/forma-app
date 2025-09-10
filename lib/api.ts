@@ -228,6 +228,16 @@ export interface UpdateUserResponse {
   error?: string;
 }
 
+export interface SendPaymentLinkRequest {
+  membershipId: string;
+}
+
+export interface SendPaymentLinkResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
 class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -344,6 +354,14 @@ export const authApi = {
         dateOfBirth: data.dateOfBirth,
         gender: data.gender,
       }),
+    }),
+
+  sendPaymentLink: (
+    data: SendPaymentLinkRequest
+  ): Promise<SendPaymentLinkResponse> =>
+    apiRequest("/api/send-payment-link", {
+      method: "POST",
+      body: JSON.stringify(data),
     }),
 
   // Test endpoint to debug proxy issues
