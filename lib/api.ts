@@ -238,6 +238,28 @@ export interface SendPaymentLinkResponse {
   error?: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
+export interface ResetPasswordRequest {
+  access_token: string;
+  refresh_token: string;
+  password: string;
+}
+
+export interface ResetPasswordResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
 class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -361,6 +383,18 @@ export const authApi = {
   ): Promise<SendPaymentLinkResponse> =>
     apiRequest("/api/send-payment-link", {
       method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  forgotPassword: (data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> =>
+    apiRequest("/api/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  resetPassword: (data: ResetPasswordRequest): Promise<ResetPasswordResponse> =>
+    apiRequest("/api/auth/reset-password", {
+      method: "PUT",
       body: JSON.stringify(data),
     }),
 

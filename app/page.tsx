@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useLanguage } from "@/lib/language-context";
 import { useTheme } from "@/lib/theme-context";
 import { authApi, ApiError } from "@/lib/api";
+import ForgotPasswordModal from "@/app/components/ForgotPasswordModal";
 
 export default function AuthPage() {
   const { signIn, isLoading: authLoading, error: authError, clearError, isAuthenticated, isGymActive } = useAuth();
@@ -19,6 +20,7 @@ export default function AuthPage() {
   const [localError, setLocalError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [hasRedirected, setHasRedirected] = useState(false);
+  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -549,6 +551,7 @@ export default function AuthPage() {
                 </div>
                 <button
                   type="button"
+                  onClick={() => setIsForgotPasswordModalOpen(true)}
                   className="text-sm hover:underline"
                   style={{ color: colors.rightPanelText }}
                 >
@@ -595,6 +598,13 @@ export default function AuthPage() {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={isForgotPasswordModalOpen}
+        onClose={() => setIsForgotPasswordModalOpen(false)}
+        onBackToLogin={() => setIsForgotPasswordModalOpen(false)}
+      />
     </div>
   );
 }
