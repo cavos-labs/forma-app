@@ -55,6 +55,23 @@ export const translations = {
     loginSuccess: "Login successful!",
     unexpectedError: "An unexpected error occurred. Please try again.",
 
+    // Forgot Password
+    forgotPasswordTitle: "Reset Your Password",
+    forgotPasswordSubtitle: "Enter your email address and we'll send you a link to reset your password",
+    forgotPasswordEmailSent: "If an account with this email exists, you will receive a password reset link.",
+    forgotPasswordBackToLogin: "Back to Login",
+    resetPasswordTitle: "Set New Password",
+    resetPasswordSubtitle: "Enter your new password below",
+    newPassword: "New Password",
+    confirmPassword: "Confirm Password",
+    passwordMismatch: "Passwords do not match",
+    passwordTooShort: "Password must be at least 8 characters long",
+    resetPasswordSuccess: "Password has been reset successfully! You can now sign in with your new password.",
+    resetPasswordButton: "Reset Password",
+    sendResetLink: "Send Reset Link",
+    resetPasswordPlaceholder: "Enter your new password",
+    confirmPasswordPlaceholder: "Confirm your new password",
+
     // Pricing Page
     pricingTitle: "Choose Your Plan",
     pricingSubtitle:
@@ -171,6 +188,23 @@ export const translations = {
     accountCreatedSuccess: "¡Cuenta creada exitosamente!",
     loginSuccess: "¡Inicio de sesión exitoso!",
     unexpectedError: "Ocurrió un error inesperado. Por favor intenta de nuevo.",
+
+    // Forgot Password
+    forgotPasswordTitle: "Restablecer tu Contraseña",
+    forgotPasswordSubtitle: "Ingresa tu dirección de email y te enviaremos un enlace para restablecer tu contraseña",
+    forgotPasswordEmailSent: "Si existe una cuenta con este email, recibirás un enlace para restablecer la contraseña.",
+    forgotPasswordBackToLogin: "Volver al Login",
+    resetPasswordTitle: "Establecer Nueva Contraseña",
+    resetPasswordSubtitle: "Ingresa tu nueva contraseña a continuación",
+    newPassword: "Nueva Contraseña",
+    confirmPassword: "Confirmar Contraseña",
+    passwordMismatch: "Las contraseñas no coinciden",
+    passwordTooShort: "La contraseña debe tener al menos 8 caracteres",
+    resetPasswordSuccess: "¡La contraseña ha sido restablecida exitosamente! Ahora puedes iniciar sesión con tu nueva contraseña.",
+    resetPasswordButton: "Restablecer Contraseña",
+    sendResetLink: "Enviar Enlace de Restablecimiento",
+    resetPasswordPlaceholder: "Ingresa tu nueva contraseña",
+    confirmPasswordPlaceholder: "Confirma tu nueva contraseña",
 
     // Pricing Page
     pricingTitle: "Elige Tu Plan",
