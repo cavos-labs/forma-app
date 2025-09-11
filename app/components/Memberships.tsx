@@ -160,9 +160,9 @@ export interface MembershipsRef {
 
 const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
   ({ onCreateUser, onEditUser, onViewReceipt }, ref) => {
-    const { colors } = useTheme();
-    const { language } = useLanguage();
-    const { gym } = useAuth();
+  const { colors } = useTheme();
+  const { language } = useLanguage();
+  const { gym, user } = useAuth();
     const [memberships, setMemberships] = useState<MembershipData[]>([]);
     const [statusFilter, setStatusFilter] = useState<MembershipStatus | "all">(
       "all"
@@ -171,6 +171,12 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isResendingLink, setIsResendingLink] = useState<string | null>(null);
+  const [selectedPayment, setSelectedPayment] = useState<{
+    id: string;
+    membershipId: string;
+    rejection_reason?: string;
+  } | null>(null);
+  const [isRejectionModalOpen, setIsRejectionModalOpen] = useState(false);
 
     // Translation function
     const t = useCallback(
@@ -388,6 +394,40 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
         // Handle error (you might want to add error notification)
       } finally {
         setIsResendingLink(null);
+      }
+    };
+
+    // Update payment status
+    const updatePaymentStatus = async (paymentId: string, status: 'approved' | 'rejected', rejectionReason?: string) => {
+      try {
+        setIsLoading(true);
+        
+        const response = await authApi.updatePayment({
+          paymentId,
+          status,
+          rejectionReason,
+          approvedBy: user?.id, // Use the logged-in user as the approver
+        });
+
+        if (response.success) {
+          // Refresh memberships list
+          await loadMemberships();
+          setIsRejectionModalOpen(false);
+          setSelectedPayment(null);
+        }
+      } catch (err) {
+        console.error('Error updating payment:', err);
+        let errorMessage = t('Error al actualizar el pago', 'Error updating payment');
+        
+        if (err instanceof ApiError) {
+          errorMessage = err.message;
+        } else if (err instanceof Error) {
+          errorMessage = err.message;
+        }
+        
+        setError(errorMessage);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -777,6 +817,7 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
                     {membership.latest_payment?.status === "pending" && (
                       <div className="flex gap-2">
                         <button
+                          onClick={() => updatePaymentStatus(membership.latest_payment!.id, 'approved')}
                           className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
                           style={{
                             backgroundColor: "#00CC44",
@@ -788,6 +829,14 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
                           {t("Aprobar", "Approve")}
                         </button>
                         <button
+                          onClick={() => {
+                            setSelectedPayment({
+                              id: membership.latest_payment!.id,
+                              membershipId: membership.id,
+                              rejection_reason: ''
+                            });
+                            setIsRejectionModalOpen(true);
+                          }}
                           className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
                           style={{
                             backgroundColor: "#FF3333",
@@ -834,6 +883,60 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
           imageUrl=""
           paymentInfo={{ amount: 0, date: "" }}
         />
+
+        {/* Rejection Modal */}
+        {isRejectionModalOpen && selectedPayment && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+            <div 
+              className="bg-white rounded-lg p-6 w-96 max-w-[90vw]"
+              style={{ backgroundColor: colors.card, color: colors.foreground }}
+            >
+              <h3 className="text-lg font-semibold mb-4">
+                {t('Rechazar Pago', 'Reject Payment')}
+              </h3>
+              <p className="mb-4" style={{ opacity: 0.8 }}>
+                {t('¿Estás seguro de que deseas rechazar este pago?', 'Are you sure you want to reject this payment?')}
+              </p>
+              <textarea
+                placeholder={t('Razón del rechazo (opcional)', 'Rejection reason (optional)')}
+                className="w-full p-2 border rounded mb-4 resize-none"
+                rows={3}
+                style={{
+                  backgroundColor: colors.inputBackground,
+                  borderColor: colors.inputBorder,
+                  color: colors.inputText
+                }}
+                onChange={(e) => {
+                  if (selectedPayment) {
+                    setSelectedPayment({
+                      ...selectedPayment,
+                      rejection_reason: e.target.value
+                    });
+                  }
+                }}
+              />
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => {
+                    setIsRejectionModalOpen(false);
+                    setSelectedPayment(null);
+                  }}
+                  className="px-4 py-2 rounded text-sm"
+                  style={{ backgroundColor: colors.border, color: colors.foreground }}
+                >
+                  {t('Cancelar', 'Cancel')}
+                </button>
+                <button
+                  onClick={() => updatePaymentStatus(selectedPayment.id, 'rejected', selectedPayment.rejection_reason || undefined)}
+                  className="px-4 py-2 rounded text-sm text-white"
+                  style={{ backgroundColor: '#DC2626' }}
+                >
+                  {t('Rechazar', 'Reject')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

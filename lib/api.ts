@@ -1,10 +1,10 @@
 import { AuthResponse } from "./types";
 
 // Use local proxy in development, direct URL in production
-const API_URL =
-  process.env.NODE_ENV === "development"
-    ? "" // Empty string uses current domain with proxy
-    : process.env.NEXT_PUBLIC_API_URL || "https://formacr.com";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// process.env.NODE_ENV === "development"
+//   ? "" // Empty string uses current domain with proxy
+//   : process.env.NEXT_PUBLIC_API_URL || "https://formacr.com";
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "";
 
 export interface SignInRequest {
