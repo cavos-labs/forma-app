@@ -52,23 +52,30 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingWorkoutId, setEditingWorkoutId] = useState<string | null>(null);
+  const [fontSize, setFontSize] = useState<
+    "small" | "medium" | "large" | "xlarge" | "xxlarge" | "xxxlarge" | "massive"
+  >("medium");
   const [successModal, setSuccessModal] = useState<{
     isOpen: boolean;
-    type: 'success' | 'error';
+    type: "success" | "error";
     title: string;
     message: string;
   }>({
     isOpen: false,
-    type: 'success',
-    title: '',
-    message: '',
+    type: "success",
+    title: "",
+    message: "",
   });
 
   const currentGymId = gymId || gym?.id;
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth();
 
-  const showSuccessModal = (type: 'success' | 'error', title: string, message: string) => {
+  const showSuccessModal = (
+    type: "success" | "error",
+    title: string,
+    message: string
+  ) => {
     setSuccessModal({
       isOpen: true,
       type,
@@ -78,7 +85,102 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
   };
 
   const closeSuccessModal = () => {
-    setSuccessModal(prev => ({ ...prev, isOpen: false }));
+    setSuccessModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  const increaseFontSize = () => {
+    setFontSize((prev) => {
+      switch (prev) {
+        case "small":
+          return "medium";
+        case "medium":
+          return "large";
+        case "large":
+          return "xlarge";
+        case "xlarge":
+          return "xxlarge";
+        case "xxlarge":
+          return "xxxlarge";
+        case "xxxlarge":
+          return "massive";
+        case "massive":
+          return "massive";
+        default:
+          return "medium";
+      }
+    });
+  };
+
+  const decreaseFontSize = () => {
+    setFontSize((prev) => {
+      switch (prev) {
+        case "small":
+          return "small";
+        case "medium":
+          return "small";
+        case "large":
+          return "medium";
+        case "xlarge":
+          return "large";
+        case "xxlarge":
+          return "xlarge";
+        case "xxxlarge":
+          return "xxlarge";
+        case "massive":
+          return "xxxlarge";
+        default:
+          return "medium";
+      }
+    });
+  };
+
+  const resetFontSize = () => {
+    setFontSize("medium");
+  };
+
+  const getFontSizeClasses = () => {
+    switch (fontSize) {
+      case "small":
+        return {
+          title: "text-3xl sm:text-4xl",
+          content: "text-xl sm:text-2xl",
+        };
+      case "medium":
+        return {
+          title: "text-4xl sm:text-5xl",
+          content: "text-2xl sm:text-3xl",
+        };
+      case "large":
+        return {
+          title: "text-5xl sm:text-6xl",
+          content: "text-3xl sm:text-4xl",
+        };
+      case "xlarge":
+        return {
+          title: "text-6xl sm:text-7xl",
+          content: "text-4xl sm:text-5xl",
+        };
+      case "xxlarge":
+        return {
+          title: "text-7xl sm:text-8xl",
+          content: "text-5xl sm:text-6xl",
+        };
+      case "xxxlarge":
+        return {
+          title: "text-8xl sm:text-9xl",
+          content: "text-6xl sm:text-7xl",
+        };
+      case "massive":
+        return {
+          title: "text-9xl sm:text-[12rem]",
+          content: "text-7xl sm:text-8xl",
+        };
+      default:
+        return {
+          title: "text-4xl sm:text-5xl",
+          content: "text-2xl sm:text-3xl",
+        };
+    }
   };
 
   const monthNames =
@@ -212,9 +314,15 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
 
   const getWorkoutForDate = (date: Date) => {
     // Use local date string to avoid timezone issues
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
+    // Create a new date in local timezone to avoid UTC conversion issues
+    const localDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+    const year = localDate.getFullYear();
+    const month = String(localDate.getMonth() + 1).padStart(2, "0");
+    const day = String(localDate.getDate()).padStart(2, "0");
     const dateString = `${year}-${month}-${day}`;
 
     const workout = workouts.find((w) => w.workout_date === dateString);
@@ -282,7 +390,7 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
 
     if (!workoutText.trim()) {
       showSuccessModal(
-        'error',
+        "error",
         language === "es" ? "Error" : "Error",
         language === "es"
           ? "Por favor agrega contenido al entrenamiento"
@@ -305,7 +413,7 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
         // The update API might not return success property, check if it has workout data
         if (response.workout || response.success !== false) {
           showSuccessModal(
-            'success',
+            "success",
             language === "es" ? "¡Éxito!" : "Success!",
             language === "es"
               ? "¡Entrenamiento actualizado exitosamente!"
@@ -313,7 +421,7 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
           );
         } else {
           showSuccessModal(
-            'error',
+            "error",
             language === "es" ? "Error" : "Error",
             language === "es"
               ? "Error al actualizar el entrenamiento"
@@ -335,7 +443,7 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
         console.log(response);
         if (response.workout) {
           showSuccessModal(
-            'success',
+            "success",
             language === "es" ? "¡Éxito!" : "Success!",
             language === "es"
               ? "¡Entrenamiento creado exitosamente!"
@@ -343,7 +451,7 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
           );
         } else {
           showSuccessModal(
-            'error',
+            "error",
             language === "es" ? "Error" : "Error",
             language === "es"
               ? "Error al crear el entrenamiento"
@@ -367,7 +475,7 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
       }
     } catch {
       showSuccessModal(
-        'error',
+        "error",
         language === "es" ? "Error" : "Error",
         language === "es"
           ? "Error al conectar con el servidor"
@@ -609,6 +717,7 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
+                      timeZone: "America/Costa_Rica",
                     }
                   )}
                 </h3>
@@ -744,19 +853,122 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
                 &quot;FORMA&quot;
               </h1>
               <div className="text-gray-400 text-xs sm:text-sm hidden sm:block">
-                {new Date(displayWorkout.workout_date).toLocaleDateString(
-                  language === "es" ? "es-ES" : "en-US",
-                  {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  }
-                )}
+                {new Date(
+                  displayWorkout.workout_date + "T00:00:00"
+                ).toLocaleDateString(language === "es" ? "es-ES" : "en-US", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  timeZone: "America/Costa_Rica",
+                })}
               </div>
             </div>
 
             <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+              {/* Font Size Controls */}
+              <div className="flex items-center space-x-1 sm:space-x-2">
+                {/* Decrease Font Size */}
+                <button
+                  onClick={decreaseFontSize}
+                  className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
+                  style={{ color: "#ffffff" }}
+                  title={
+                    language === "es"
+                      ? "Disminuir tamaño de letra"
+                      : "Decrease font size"
+                  }
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M20 12H4"
+                    />
+                  </svg>
+                </button>
+
+                {/* Font Size Indicator */}
+                <div
+                  className="px-2 py-1 rounded text-xs border border-gray-600 flex items-center"
+                  style={{ color: "#ffffff" }}
+                >
+                  <span
+                    className={`${
+                      fontSize === "small"
+                        ? "text-xs"
+                        : fontSize === "medium"
+                        ? "text-sm"
+                        : fontSize === "large"
+                        ? "text-base"
+                        : fontSize === "xlarge"
+                        ? "text-lg"
+                        : fontSize === "xxlarge"
+                        ? "text-xl"
+                        : fontSize === "xxxlarge"
+                        ? "text-2xl"
+                        : "text-3xl"
+                    }`}
+                  >
+                    A
+                  </span>
+                </div>
+
+                {/* Increase Font Size */}
+                <button
+                  onClick={increaseFontSize}
+                  className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
+                  style={{ color: "#ffffff" }}
+                  title={
+                    language === "es"
+                      ? "Aumentar tamaño de letra"
+                      : "Increase font size"
+                  }
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                </button>
+
+                {/* Reset Font Size */}
+                <button
+                  onClick={resetFontSize}
+                  className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
+                  style={{ color: "#ffffff" }}
+                  title={language === "es" ? "Tamaño normal" : "Normal size"}
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                </button>
+              </div>
+
               {/* Edit Button */}
               <button
                 onClick={() => {
@@ -831,18 +1043,109 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
             </div>
           </div>
 
-          {/* Mobile date display */}
+          {/* Mobile date display and font controls */}
           <div className="sm:hidden px-3 py-2 border-b border-gray-800">
-            <div className="text-gray-400 text-sm text-center">
-              {new Date(displayWorkout.workout_date).toLocaleDateString(
-                language === "es" ? "es-ES" : "en-US",
-                {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                }
-              )}
+            <div className="text-gray-400 text-sm text-center mb-3">
+              {new Date(
+                displayWorkout.workout_date + "T00:00:00"
+              ).toLocaleDateString(language === "es" ? "es-ES" : "en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                timeZone: "America/Costa_Rica",
+              })}
+            </div>
+
+            {/* Mobile Font Size Controls */}
+            <div className="flex items-center justify-center space-x-2">
+              <button
+                onClick={decreaseFontSize}
+                className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 transition-colors touch-manipulation"
+                style={{ color: "#ffffff" }}
+                title={language === "es" ? "Disminuir tamaño" : "Decrease size"}
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20 12H4"
+                  />
+                </svg>
+              </button>
+
+              <div
+                className="px-3 py-1 rounded text-xs border border-gray-600 flex items-center"
+                style={{ color: "#ffffff" }}
+              >
+                <span
+                  className={`${
+                    fontSize === "small"
+                      ? "text-xs"
+                      : fontSize === "medium"
+                      ? "text-sm"
+                      : fontSize === "large"
+                      ? "text-base"
+                      : fontSize === "xlarge"
+                      ? "text-lg"
+                      : fontSize === "xxlarge"
+                      ? "text-xl"
+                      : fontSize === "xxxlarge"
+                      ? "text-2xl"
+                      : "text-3xl"
+                  }`}
+                >
+                  A
+                </span>
+              </div>
+
+              <button
+                onClick={increaseFontSize}
+                className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 transition-colors touch-manipulation"
+                style={{ color: "#ffffff" }}
+                title={language === "es" ? "Aumentar tamaño" : "Increase size"}
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+              </button>
+
+              <button
+                onClick={resetFontSize}
+                className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 transition-colors touch-manipulation"
+                style={{ color: "#ffffff" }}
+                title={language === "es" ? "Normal" : "Normal"}
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -854,22 +1157,27 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
                 style={{ color: "#ffffff" }}
               >
                 {parseWorkoutText(displayWorkout.workout_text).map(
-                  (element, index) => (
-                    <div key={index}>
-                      {element.type === "title" ? (
-                        <h2
-                          className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center uppercase tracking-wider"
-                          style={{ fontFamily: "Romagothic, sans-serif" }}
-                        >
-                          {element.content}
-                        </h2>
-                      ) : (
-                        <div className="text-base sm:text-xl leading-relaxed whitespace-pre-line text-center max-w-3xl mx-auto px-2">
-                          {element.content}
-                        </div>
-                      )}
-                    </div>
-                  )
+                  (element, index) => {
+                    const fontClasses = getFontSizeClasses();
+                    return (
+                      <div key={index}>
+                        {element.type === "title" ? (
+                          <h2
+                            className={`${fontClasses.title} font-bold mb-4 sm:mb-6 text-center uppercase tracking-wider`}
+                            style={{ fontFamily: "Romagothic, sans-serif" }}
+                          >
+                            {element.content}
+                          </h2>
+                        ) : (
+                          <div
+                            className={`${fontClasses.content} leading-relaxed whitespace-pre-line text-center max-w-3xl mx-auto px-2`}
+                          >
+                            {element.content}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
                 )}
               </div>
             </div>
