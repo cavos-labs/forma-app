@@ -160,9 +160,9 @@ export interface MembershipsRef {
 
 const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
   ({ onCreateUser, onEditUser, onViewReceipt }, ref) => {
-  const { colors } = useTheme();
-  const { language } = useLanguage();
-  const { gym, user } = useAuth();
+    const { colors } = useTheme();
+    const { language } = useLanguage();
+    const { gym, user } = useAuth();
     const [memberships, setMemberships] = useState<MembershipData[]>([]);
     const [statusFilter, setStatusFilter] = useState<MembershipStatus | "all">(
       "all"
@@ -171,12 +171,12 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isResendingLink, setIsResendingLink] = useState<string | null>(null);
-  const [selectedPayment, setSelectedPayment] = useState<{
-    id: string;
-    membershipId: string;
-    rejection_reason?: string;
-  } | null>(null);
-  const [isRejectionModalOpen, setIsRejectionModalOpen] = useState(false);
+    const [selectedPayment, setSelectedPayment] = useState<{
+      id: string;
+      membershipId: string;
+      rejection_reason?: string;
+    } | null>(null);
+    const [isRejectionModalOpen, setIsRejectionModalOpen] = useState(false);
 
     // Translation function
     const t = useCallback(
@@ -398,10 +398,14 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
     };
 
     // Update payment status
-    const updatePaymentStatus = async (paymentId: string, status: 'approved' | 'rejected', rejectionReason?: string) => {
+    const updatePaymentStatus = async (
+      paymentId: string,
+      status: "approved" | "rejected",
+      rejectionReason?: string
+    ) => {
       try {
         setIsLoading(true);
-        
+
         const response = await authApi.updatePayment({
           paymentId,
           status,
@@ -416,15 +420,18 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
           setSelectedPayment(null);
         }
       } catch (err) {
-        console.error('Error updating payment:', err);
-        let errorMessage = t('Error al actualizar el pago', 'Error updating payment');
-        
+        console.error("Error updating payment:", err);
+        let errorMessage = t(
+          "Error al actualizar el pago",
+          "Error updating payment"
+        );
+
         if (err instanceof ApiError) {
           errorMessage = err.message;
         } else if (err instanceof Error) {
           errorMessage = err.message;
         }
-        
+
         setError(errorMessage);
       } finally {
         setIsLoading(false);
@@ -724,16 +731,17 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
                     </div>
                   )}
 
-                  {/* Action Row */}
+                  {/* Action Row - Responsive layout */}
                   <div
-                    className="flex justify-between items-center pt-2 border-t"
+                    className="pt-2 border-t"
                     style={{ borderColor: colors.border }}
                   >
-                    <div className="flex gap-2">
+                    {/* Primary Actions Row - Always visible */}
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
                       {/* Edit User Button */}
                       <button
                         onClick={() => onEditUser(membership)}
-                        className="text-xs px-3 py-1.5 rounded-lg font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+                        className="text-xs px-2.5 sm:px-3 py-1.5 rounded-lg font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 flex-shrink-0"
                         style={{
                           backgroundColor: "#FF6B35",
                           color: "white",
@@ -745,6 +753,7 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
                         {t("Editar Cliente", "Edit Client")}
                       </button>
 
+                      {/* Receipt Button or Status */}
                       {membership.latest_payment?.payment_proof_url &&
                       !membership.latest_payment.payment_proof_url.includes(
                         "pending-upload"
@@ -766,7 +775,7 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
                               },
                             });
                           }}
-                          className="text-xs px-3 py-1.5 rounded-lg font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+                          className="text-xs px-2.5 sm:px-3 py-1.5 rounded-lg font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 flex-shrink-0"
                           style={{
                             backgroundColor: "#0066ff",
                             color: "white",
@@ -778,24 +787,26 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
                         </button>
                       ) : membership.latest_payment ? (
                         <span
-                          className="text-xs px-2 py-1"
+                          className="text-xs px-2 py-1 flex-shrink-0"
                           style={{ color: colors.foreground, opacity: 0.5 }}
                         >
                           {t("Sin comprobante", "No receipt")}
                         </span>
                       ) : (
                         <span
-                          className="text-xs px-2 py-1"
+                          className="text-xs px-2 py-1 flex-shrink-0"
                           style={{ color: colors.foreground, opacity: 0.5 }}
                         >
                           {t("Sin pagos", "No payments")}
                         </span>
                       )}
+
+                      {/* Resend Link Button */}
                       {membership.status !== "active" && (
                         <button
                           onClick={() => handleResendPaymentLink(membership.id)}
                           disabled={isResendingLink === membership.id}
-                          className="text-xs px-3 py-1.5 rounded-lg font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 disabled:opacity-50"
+                          className="text-xs px-2.5 sm:px-3 py-1.5 rounded-lg font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 disabled:opacity-50 flex-shrink-0"
                           style={{
                             backgroundColor: "#8B5CF6",
                             color: "white",
@@ -814,11 +825,17 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
                       )}
                     </div>
 
+                    {/* Payment Action Buttons - Only for pending payments */}
                     {membership.latest_payment?.status === "pending" && (
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
                         <button
-                          onClick={() => updatePaymentStatus(membership.latest_payment!.id, 'approved')}
-                          className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+                          onClick={() =>
+                            updatePaymentStatus(
+                              membership.latest_payment!.id,
+                              "approved"
+                            )
+                          }
+                          className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 flex-1 min-w-[70px] sm:min-w-[80px]"
                           style={{
                             backgroundColor: "#00CC44",
                             color: "white",
@@ -833,11 +850,11 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
                             setSelectedPayment({
                               id: membership.latest_payment!.id,
                               membershipId: membership.id,
-                              rejection_reason: ''
+                              rejection_reason: "",
                             });
                             setIsRejectionModalOpen(true);
                           }}
-                          className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
+                          className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 flex-1 min-w-[70px] sm:min-w-[80px]"
                           style={{
                             backgroundColor: "#FF3333",
                             color: "white",
@@ -887,30 +904,36 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
         {/* Rejection Modal */}
         {isRejectionModalOpen && selectedPayment && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
-            <div 
+            <div
               className="bg-white rounded-lg p-6 w-96 max-w-[90vw]"
               style={{ backgroundColor: colors.card, color: colors.foreground }}
             >
               <h3 className="text-lg font-semibold mb-4">
-                {t('Rechazar Pago', 'Reject Payment')}
+                {t("Rechazar Pago", "Reject Payment")}
               </h3>
               <p className="mb-4" style={{ opacity: 0.8 }}>
-                {t('¿Estás seguro de que deseas rechazar este pago?', 'Are you sure you want to reject this payment?')}
+                {t(
+                  "¿Estás seguro de que deseas rechazar este pago?",
+                  "Are you sure you want to reject this payment?"
+                )}
               </p>
               <textarea
-                placeholder={t('Razón del rechazo (opcional)', 'Rejection reason (optional)')}
+                placeholder={t(
+                  "Razón del rechazo (opcional)",
+                  "Rejection reason (optional)"
+                )}
                 className="w-full p-2 border rounded mb-4 resize-none"
                 rows={3}
                 style={{
                   backgroundColor: colors.inputBackground,
                   borderColor: colors.inputBorder,
-                  color: colors.inputText
+                  color: colors.inputText,
                 }}
                 onChange={(e) => {
                   if (selectedPayment) {
                     setSelectedPayment({
                       ...selectedPayment,
-                      rejection_reason: e.target.value
+                      rejection_reason: e.target.value,
                     });
                   }
                 }}
@@ -922,16 +945,25 @@ const Memberships = forwardRef<MembershipsRef, MembershipsProps>(
                     setSelectedPayment(null);
                   }}
                   className="px-4 py-2 rounded text-sm"
-                  style={{ backgroundColor: colors.border, color: colors.foreground }}
+                  style={{
+                    backgroundColor: colors.border,
+                    color: colors.foreground,
+                  }}
                 >
-                  {t('Cancelar', 'Cancel')}
+                  {t("Cancelar", "Cancel")}
                 </button>
                 <button
-                  onClick={() => updatePaymentStatus(selectedPayment.id, 'rejected', selectedPayment.rejection_reason || undefined)}
+                  onClick={() =>
+                    updatePaymentStatus(
+                      selectedPayment.id,
+                      "rejected",
+                      selectedPayment.rejection_reason || undefined
+                    )
+                  }
                   className="px-4 py-2 rounded text-sm text-white"
-                  style={{ backgroundColor: '#DC2626' }}
+                  style={{ backgroundColor: "#DC2626" }}
                 >
-                  {t('Rechazar', 'Reject')}
+                  {t("Rechazar", "Reject")}
                 </button>
               </div>
             </div>
