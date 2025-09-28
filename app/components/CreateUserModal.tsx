@@ -124,17 +124,6 @@ export default function CreateUserModal({
         language === "es"
           ? "La fecha de inicio es requerida"
           : "Start date is required";
-    } else {
-      const startDate = new Date(formData.start_date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (startDate < today) {
-        newErrors.start_date =
-          language === "es"
-            ? "La fecha de inicio no puede ser anterior a hoy"
-            : "Start date cannot be before today";
-      }
     }
 
     setErrors(newErrors);
