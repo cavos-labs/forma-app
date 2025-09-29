@@ -993,7 +993,6 @@ export default function CreateUserModal({
                     name="start_date"
                     value={formData.start_date}
                     onChange={handleInputChange}
-                    min={new Date().toISOString().split("T")[0]}
                     className="w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200"
                     style={{
                       backgroundColor: colors.inputBackground,
