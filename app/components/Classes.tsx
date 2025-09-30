@@ -910,251 +910,342 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
           data-fullscreen-modal
           className="fixed inset-0 z-50 flex flex-col bg-black bg-opacity-90"
         >
-          {/* Header with controls */}
-          <div className="flex justify-between items-center p-3 sm:p-6 border-b border-gray-800">
-            <div className="flex items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
-              <h1
-                className="text-2xl sm:text-4xl font-bold"
-                style={{
-                  color: "#ffffff",
-                  fontFamily: "Romagothic, sans-serif",
-                }}
-              >
-                &quot;FORMA&quot;
-              </h1>
-              <div className="text-gray-400 text-xs sm:text-sm hidden sm:block">
-                {new Date(
-                  displayWorkout.workout_date + "T00:00:00"
-                ).toLocaleDateString(language === "es" ? "es-ES" : "en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  timeZone: "America/Costa_Rica",
-                })}
-              </div>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
-              {/* Font Size Controls */}
-              <div className="flex items-center space-x-1 sm:space-x-2">
-                {/* Decrease Font Size */}
-                <button
-                  onClick={decreaseFontSize}
-                  className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
-                  style={{ color: "#ffffff" }}
-                  title={
-                    language === "es"
-                      ? "Disminuir tamaño de letra"
-                      : "Decrease font size"
-                  }
+          {/* Header - Only show when NOT in fullscreen */}
+          {!isFullscreen && (
+            <div className="flex justify-between items-center p-3 sm:p-6 border-b border-gray-800">
+              <div className="flex items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
+                <h1
+                  className="text-2xl sm:text-4xl font-bold"
+                  style={{
+                    color: "#ffffff",
+                    fontFamily: "Romagothic, sans-serif",
+                  }}
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M20 12H4"
-                    />
-                  </svg>
-                </button>
-
-                {/* Font Size Indicator */}
-                <div
-                  className="px-2 py-1 rounded text-xs border border-gray-600 flex items-center"
-                  style={{ color: "#ffffff" }}
-                >
-                  <span
-                    className={`${
-                      fontSize === "small"
-                        ? "text-xs"
-                        : fontSize === "medium"
-                        ? "text-sm"
-                        : fontSize === "large"
-                        ? "text-base"
-                        : fontSize === "xlarge"
-                        ? "text-lg"
-                        : fontSize === "xxlarge"
-                        ? "text-xl"
-                        : fontSize === "xxxlarge"
-                        ? "text-2xl"
-                        : "text-3xl"
-                    }`}
-                  >
-                    A
-                  </span>
+                  &quot;FORMA&quot;
+                </h1>
+                <div className="text-gray-400 text-xs sm:text-sm hidden sm:block">
+                  {new Date(
+                    displayWorkout.workout_date + "T00:00:00"
+                  ).toLocaleDateString(language === "es" ? "es-ES" : "en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    timeZone: "America/Costa_Rica",
+                  })}
                 </div>
-
-                {/* Increase Font Size */}
-                <button
-                  onClick={increaseFontSize}
-                  className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
-                  style={{ color: "#ffffff" }}
-                  title={
-                    language === "es"
-                      ? "Aumentar tamaño de letra"
-                      : "Increase font size"
-                  }
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v16m8-8H4"
-                    />
-                  </svg>
-                </button>
-
-                {/* Reset Font Size */}
-                <button
-                  onClick={resetFontSize}
-                  className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
-                  style={{ color: "#ffffff" }}
-                  title={language === "es" ? "Tamaño normal" : "Normal size"}
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    />
-                  </svg>
-                </button>
               </div>
 
-              {/* Fullscreen Button */}
-              <button
-                onClick={async (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  console.log("Button clicked!");
-                  await toggleFullscreen();
-                }}
-                className="px-3 sm:px-4 py-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
-                style={{ color: "#ffffff" }}
-                title={language === "es" ? "Pantalla completa" : "Fullscreen"}
-                type="button"
-              >
+              <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+                {/* Font Size Controls */}
                 <div className="flex items-center space-x-1 sm:space-x-2">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                  {/* Decrease Font Size */}
+                  <button
+                    onClick={decreaseFontSize}
+                    className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
+                    style={{ color: "#ffffff" }}
+                    title={
+                      language === "es"
+                        ? "Disminuir tamaño de letra"
+                        : "Decrease font size"
+                    }
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d={
-                        isFullscreen
-                          ? "M9 9V4.5M9 9H4.5M9 9L3.5 3.5M15 9h4.5M15 9V4.5M15 9l5.5-5.5M9 15v4.5M9 15H4.5M9 15l-5.5 5.5M15 15h4.5M15 15v4.5m0-4.5l5.5 5.5"
-                          : "M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-                      }
-                    />
-                  </svg>
-                  <span className="hidden sm:inline">
-                    {language === "es"
-                      ? isFullscreen
-                        ? "Salir"
-                        : "Pantalla completa"
-                      : isFullscreen
-                      ? "Exit"
-                      : "Fullscreen"}
-                  </span>
-                </div>
-              </button>
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M20 12H4"
+                      />
+                    </svg>
+                  </button>
 
-              {/* Edit Button */}
-              <button
-                onClick={() => {
-                  // Parse existing workout for editing
-                  const parsed = parseWorkoutText(displayWorkout.workout_text);
-                  const elements: WorkoutElement[] = parsed.map(
-                    (el, index) => ({
-                      id: `${Date.now()}_${index}`,
-                      type: el.type,
-                      content: el.content,
-                    })
-                  );
-
-                  // Switch to edit mode
-                  setWorkoutElements(elements);
-                  // Parse date properly to avoid timezone issues
-                  const dateParts = displayWorkout.workout_date.split("-");
-                  const workoutDate = new Date(
-                    parseInt(dateParts[0]),
-                    parseInt(dateParts[1]) - 1,
-                    parseInt(dateParts[2])
-                  );
-                  setSelectedDate(workoutDate);
-                  setIsEditing(true);
-                  setEditingWorkoutId(displayWorkout.id);
-                  setIsDisplayModalOpen(false);
-                  setIsModalOpen(true);
-                }}
-                className="px-3 sm:px-4 py-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
-                style={{ color: "#ffffff" }}
-              >
-                <div className="flex items-center space-x-1 sm:space-x-2">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                  {/* Font Size Indicator */}
+                  <div
+                    className="px-2 py-1 rounded text-xs border border-gray-600 flex items-center"
+                    style={{ color: "#ffffff" }}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                  <span className="hidden sm:inline">
-                    {language === "es" ? "Editar" : "Edit"}
-                  </span>
-                </div>
-              </button>
+                    <span
+                      className={`${
+                        fontSize === "small"
+                          ? "text-xs"
+                          : fontSize === "medium"
+                          ? "text-sm"
+                          : fontSize === "large"
+                          ? "text-base"
+                          : fontSize === "xlarge"
+                          ? "text-lg"
+                          : fontSize === "xxlarge"
+                          ? "text-xl"
+                          : fontSize === "xxxlarge"
+                          ? "text-2xl"
+                          : "text-3xl"
+                      }`}
+                    >
+                      A
+                    </span>
+                  </div>
 
-              {/* Close Button */}
-              <button
-                onClick={() => setIsDisplayModalOpen(false)}
-                className="p-2 rounded-lg active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
-                style={{ color: "#ffffff" }}
-              >
-                <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                  {/* Increase Font Size */}
+                  <button
+                    onClick={increaseFontSize}
+                    className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
+                    style={{ color: "#ffffff" }}
+                    title={
+                      language === "es"
+                        ? "Aumentar tamaño de letra"
+                        : "Increase font size"
+                    }
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                  </button>
+
+                  {/* Reset Font Size */}
+                  <button
+                    onClick={resetFontSize}
+                    className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
+                    style={{ color: "#ffffff" }}
+                    title={language === "es" ? "Tamaño normal" : "Normal size"}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Fullscreen Button */}
+                <button
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    await toggleFullscreen();
+                  }}
+                  className="px-3 sm:px-4 py-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
+                  style={{ color: "#ffffff" }}
+                  title={language === "es" ? "Pantalla completa" : "Fullscreen"}
+                  type="button"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                  <div className="flex items-center space-x-1 sm:space-x-2">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d={
+                          isFullscreen
+                            ? "M9 9V4.5M9 9H4.5M9 9L3.5 3.5M15 9h4.5M15 9V4.5M15 9l5.5-5.5M9 15v4.5M9 15H4.5M9 15l-5.5 5.5M15 15h4.5M15 15v4.5m0-4.5l5.5 5.5"
+                            : "M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                        }
+                      />
+                    </svg>
+                    <span className="hidden sm:inline">
+                      {language === "es"
+                        ? isFullscreen
+                          ? "Salir"
+                          : "Pantalla completa"
+                        : isFullscreen
+                        ? "Exit"
+                        : "Fullscreen"}
+                    </span>
+                  </div>
+                </button>
+
+                {/* Edit Button */}
+                <button
+                  onClick={() => {
+                    // Parse existing workout for editing
+                    const parsed = parseWorkoutText(
+                      displayWorkout.workout_text
+                    );
+                    const elements: WorkoutElement[] = parsed.map(
+                      (el, index) => ({
+                        id: `${Date.now()}_${index}`,
+                        type: el.type,
+                        content: el.content,
+                      })
+                    );
+
+                    // Switch to edit mode
+                    setWorkoutElements(elements);
+                    // Parse date properly to avoid timezone issues
+                    const dateParts = displayWorkout.workout_date.split("-");
+                    const workoutDate = new Date(
+                      parseInt(dateParts[0]),
+                      parseInt(dateParts[1]) - 1,
+                      parseInt(dateParts[2])
+                    );
+                    setSelectedDate(workoutDate);
+                    setIsEditing(true);
+                    setEditingWorkoutId(displayWorkout.id);
+                    setIsDisplayModalOpen(false);
+                    setIsModalOpen(true);
+                  }}
+                  className="px-3 sm:px-4 py-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
+                  style={{ color: "#ffffff" }}
+                >
+                  <div className="flex items-center space-x-1 sm:space-x-2">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    <span className="hidden sm:inline">
+                      {language === "es" ? "Editar" : "Edit"}
+                    </span>
+                  </div>
+                </button>
+
+                {/* Close Button */}
+                <button
+                  onClick={() => setIsDisplayModalOpen(false)}
+                  className="p-2 rounded-lg active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
+                  style={{ color: "#ffffff" }}
+                >
+                  <svg
+                    className="w-5 h-5 sm:w-6 sm:h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Top Controls - Only zoom controls (only in fullscreen) */}
+          {isFullscreen && (
+            <div className="flex justify-center items-center p-4">
+              <div className="flex items-center space-x-2">
+                {/* Font Size Controls */}
+                <div className="flex items-center space-x-1 sm:space-x-2">
+                  {/* Decrease Font Size */}
+                  <button
+                    onClick={decreaseFontSize}
+                    className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
+                    style={{ color: "#ffffff" }}
+                    title={
+                      language === "es"
+                        ? "Disminuir tamaño de letra"
+                        : "Decrease font size"
+                    }
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M20 12H4"
+                      />
+                    </svg>
+                  </button>
+
+                  {/* Font Size Indicator */}
+                  <div
+                    className="px-2 py-1 rounded text-xs border border-gray-600 flex items-center"
+                    style={{ color: "#ffffff" }}
+                  >
+                    <span
+                      className={`${
+                        fontSize === "small"
+                          ? "text-xs"
+                          : fontSize === "medium"
+                          ? "text-sm"
+                          : fontSize === "large"
+                          ? "text-base"
+                          : fontSize === "xlarge"
+                          ? "text-lg"
+                          : fontSize === "xxlarge"
+                          ? "text-xl"
+                          : fontSize === "xxxlarge"
+                          ? "text-2xl"
+                          : "text-3xl"
+                      }`}
+                    >
+                      A
+                    </span>
+                  </div>
+
+                  {/* Increase Font Size */}
+                  <button
+                    onClick={increaseFontSize}
+                    className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
+                    style={{ color: "#ffffff" }}
+                    title={
+                      language === "es"
+                        ? "Aumentar tamaño de letra"
+                        : "Increase font size"
+                    }
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Mobile date display and font controls */}
           <div className="sm:hidden px-3 py-2 border-b border-gray-800">
@@ -1295,6 +1386,75 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
               </div>
             </div>
           </div>
+
+          {/* Date Display - Top Left (only in fullscreen) */}
+          {isFullscreen && (
+            <div className="absolute top-4 left-4">
+              <div className="text-white text-sm sm:text-base font-medium">
+                {new Date(
+                  displayWorkout.workout_date + "T00:00:00"
+                ).toLocaleDateString(language === "es" ? "es-ES" : "en-US", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  timeZone: "America/Costa_Rica",
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Exit Fullscreen Button - Top Right (only in fullscreen) */}
+          {isFullscreen && (
+            <div className="absolute top-4 right-4 z-10">
+              <button
+                onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  await toggleFullscreen();
+                }}
+                className="p-3 rounded-lg bg-gray-800 bg-opacity-80 hover:bg-opacity-100 transition-all backdrop-blur-sm"
+                style={{ color: "#ffffff" }}
+                title={
+                  language === "es"
+                    ? "Salir de pantalla completa (Esc)"
+                    : "Exit fullscreen (Esc)"
+                }
+                type="button"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {/* FORMA Logo - Bottom Right (only in fullscreen) */}
+          {isFullscreen && (
+            <div className="absolute bottom-6 right-6">
+              <div className="flex items-center space-x-2">
+                <h1
+                  className="text-2xl sm:text-3xl font-bold"
+                  style={{
+                    color: "#ffffff",
+                    fontFamily: "Romagothic, sans-serif",
+                  }}
+                >
+                  &quot;FORMA&quot;
+                </h1>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
