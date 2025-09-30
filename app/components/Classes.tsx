@@ -45,6 +45,7 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDisplayModalOpen, setIsDisplayModalOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [workoutElements, setWorkoutElements] = useState<WorkoutElement[]>([]);
   const [displayWorkout, setDisplayWorkout] = useState<DailyWorkout | null>(
     null
@@ -87,6 +88,72 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
   const closeSuccessModal = () => {
     setSuccessModal((prev) => ({ ...prev, isOpen: false }));
   };
+
+  const toggleFullscreen = async () => {
+    console.log("Toggle fullscreen clicked, current state:", isFullscreen);
+
+    try {
+      if (!document.fullscreenElement) {
+        // Enter fullscreen
+        const modalElement = document.querySelector(
+          "[data-fullscreen-modal]"
+        ) as HTMLElement;
+        if (modalElement) {
+          await modalElement.requestFullscreen();
+          setIsFullscreen(true);
+        }
+      } else {
+        // Exit fullscreen
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } catch (error) {
+      console.error("Error toggling fullscreen:", error);
+    }
+  };
+
+  const exitFullscreen = async () => {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } catch (error) {
+      console.error("Error exiting fullscreen:", error);
+    }
+  };
+
+  // Debug fullscreen state changes
+  useEffect(() => {
+    console.log("isFullscreen state changed to:", isFullscreen);
+  }, [isFullscreen]);
+
+  // Handle fullscreen change events
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const isCurrentlyFullscreen = !!document.fullscreenElement;
+      console.log("Fullscreen change detected:", isCurrentlyFullscreen);
+      setIsFullscreen(isCurrentlyFullscreen);
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  // Handle escape key to exit fullscreen
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isFullscreen) {
+        exitFullscreen();
+      }
+    };
+
+    if (isFullscreen) {
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [isFullscreen]);
 
   const increaseFontSize = () => {
     setFontSize((prev) => {
@@ -839,7 +906,10 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
 
       {/* Display Workout Modal - Fullscreen */}
       {isDisplayModalOpen && displayWorkout && (
-        <div className="fixed inset-0 bg-black z-50 flex flex-col">
+        <div
+          data-fullscreen-modal
+          className="fixed inset-0 z-50 flex flex-col bg-black bg-opacity-90"
+        >
           {/* Header with controls */}
           <div className="flex justify-between items-center p-3 sm:p-6 border-b border-gray-800">
             <div className="flex items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
@@ -865,7 +935,7 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+            <div className="hidden md:flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
               {/* Font Size Controls */}
               <div className="flex items-center space-x-1 sm:space-x-2">
                 {/* Decrease Font Size */}
@@ -969,6 +1039,49 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
                 </button>
               </div>
 
+              {/* Fullscreen Button */}
+              <button
+                onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log("Button clicked!");
+                  await toggleFullscreen();
+                }}
+                className="px-3 sm:px-4 py-2 rounded-lg border border-gray-600 active:bg-gray-800 sm:hover:bg-gray-800 transition-colors touch-manipulation"
+                style={{ color: "#ffffff" }}
+                title={language === "es" ? "Pantalla completa" : "Fullscreen"}
+                type="button"
+              >
+                <div className="flex items-center space-x-1 sm:space-x-2">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d={
+                        isFullscreen
+                          ? "M9 9V4.5M9 9H4.5M9 9L3.5 3.5M15 9h4.5M15 9V4.5M15 9l5.5-5.5M9 15v4.5M9 15H4.5M9 15l-5.5 5.5M15 15h4.5M15 15v4.5m0-4.5l5.5 5.5"
+                          : "M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                      }
+                    />
+                  </svg>
+                  <span className="hidden sm:inline">
+                    {language === "es"
+                      ? isFullscreen
+                        ? "Salir"
+                        : "Pantalla completa"
+                      : isFullscreen
+                      ? "Exit"
+                      : "Fullscreen"}
+                  </span>
+                </div>
+              </button>
+
               {/* Edit Button */}
               <button
                 onClick={() => {
@@ -1058,7 +1171,7 @@ const Classes = forwardRef<ClassesRef, ClassesProps>(({ gymId }, ref) => {
             </div>
 
             {/* Mobile Font Size Controls */}
-            <div className="flex items-center justify-center space-x-2">
+            <div className="flex md:hidden items-center justify-center space-x-2">
               <button
                 onClick={decreaseFontSize}
                 className="p-2 rounded-lg border border-gray-600 active:bg-gray-800 transition-colors touch-manipulation"
